@@ -352,5 +352,13 @@ SOURCE=.\protocal.htm
 
 SOURCE=.\protocal.txt
 # End Source File
+# Begin Source File
+
+SOURCE=.\res\ringin.wav
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\ringout.wav
+# End Source File
 # End Target
 # End Project

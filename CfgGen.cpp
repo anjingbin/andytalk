@@ -31,6 +31,10 @@ CCfgGen::CCfgGen() : CPropertyPage(CCfgGen::IDD)
 	m_nRetry = 0;
 	m_nRetryInterval = 0;
 	m_beep = FALSE;
+	m_Emote1 = _T("");
+	m_Emote2 = _T("");
+	m_Emote3 = _T("");
+	m_EmoteEsc = _T("");
 	//}}AFX_DATA_INIT
 }
 
@@ -56,6 +60,14 @@ void CCfgGen::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_RETRYINTERVAL, m_nRetryInterval);
 	DDV_MinMaxInt(pDX, m_nRetryInterval, 1, 10000);
 	DDX_Check(pDX, IDC_BEEP, m_beep);
+	DDX_Text(pDX, IDC_EMOTE1, m_Emote1);
+	DDV_MaxChars(pDX, m_Emote1, 1);
+	DDX_Text(pDX, IDC_EMOTE2, m_Emote2);
+	DDV_MaxChars(pDX, m_Emote2, 1);
+	DDX_Text(pDX, IDC_EMOTE3, m_Emote3);
+	DDV_MaxChars(pDX, m_Emote3, 1);
+	DDX_Text(pDX, IDC_EMOTEESC, m_EmoteEsc);
+	DDV_MaxChars(pDX, m_EmoteEsc, 1);
 	//}}AFX_DATA_MAP
 }
 

@@ -77,29 +77,30 @@ BOOL CLocalOut::PreTranslateMessage(MSG* pMsg)
 
 void CLocalOut::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	if((nChar=='@'||nChar=='#'||nChar=='$'||nChar=='\\')&&!(GetStyle()&ES_READONLY)){
+	CClientWnd * pWnd=(CClientWnd*)GetParent();
+	CConfig * m_pConfig;
+	if(pWnd)
+		m_pConfig=&pWnd->m_Config;
+
+	char ch=(char)nChar;
+	
+	if((ch==m_pConfig->m_Emote1||ch==m_pConfig->m_Emote2||ch==m_pConfig->m_Emote3||ch==m_pConfig->m_EmoteEsc)&&!(GetStyle()&ES_READONLY)){
 		CInplaceEdit *pEdit = new CInplaceEdit();
 		CPoint pt=GetCaretPos();
 		if(pEdit && pEdit->Create( WS_BORDER|WS_CHILD|ES_AUTOHSCROLL,
 			CRect(pt,CSize(100,16)),
 			this, 
 			100)){
-			switch(nChar){
-			case '@':
+
+			if(ch==m_pConfig->m_Emote1)
 				pEdit->m_nType=1;
-				break;
-			case '#':
+			else if(ch==m_pConfig->m_Emote2)
 				pEdit->m_nType=2;
-				break;
-			case '$':
+			else if(ch==m_pConfig->m_Emote3)
 				pEdit->m_nType=3;
-				break;
-			case '\\':
+			else if(ch==m_pConfig->m_EmoteEsc)
 				pEdit->m_nType=0;
-				break;
-			default:
-				break;
-			}
+
 			DestroyCaret();
 			pEdit->ShowWindow(SW_SHOW);
 			pEdit->SetWindowText(m_sInplace[pEdit->m_nType]);

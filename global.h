@@ -131,6 +131,11 @@ public:
 	int nConfirmTime;		//confirm tine in seconds
 	CString sMyName;		//my name
 
+	char	m_Emote1;
+	char	m_Emote2;
+	char	m_Emote3;
+	char	m_EmoteEsc;
+
 
 	CConfig();
 	virtual ~CConfig();

@@ -31,7 +31,12 @@ CConfig::CConfig()
 	bVScroll=true;
 	nRetry=3;
 	nRetryInterval=1;
-	
+
+	m_Emote1='@';
+	m_Emote2='#';
+	m_Emote3='$';
+	m_EmoteEsc='\\';
+
 }
 
 CConfig::~CConfig()
@@ -58,6 +63,10 @@ BOOL CConfig::Store()
 		cfgar<<bVScroll;
 		cfgar<<nRetry;
 		cfgar<<nRetryInterval;
+		cfgar<<m_Emote1;
+		cfgar<<m_Emote2;
+		cfgar<<m_Emote3;
+		cfgar<<m_EmoteEsc;
 		return true;
 	}	
 	return false;
@@ -84,6 +93,11 @@ BOOL CConfig::Load()
 		cfgar>>bVScroll;
 		cfgar>>nRetry;
 		cfgar>>nRetryInterval;
+		cfgar>>m_Emote1;
+		cfgar>>m_Emote2;
+		cfgar>>m_Emote3;
+		cfgar>>m_EmoteEsc;
+
 	}
 	return true;
 }

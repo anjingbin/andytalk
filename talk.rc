@@ -88,18 +88,18 @@ IDR_MAINFRAME MENU PRELOAD DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Connect...",                 ID_CONNECT
-        MENUITEM "&Reconnect",                  ID_REC, INACTIVE
-        MENUITEM "&Disconnect",                 ID_DISC, GRAYED
-        MENUITEM "&Beep",                       ID_BEEP, GRAYED
+        MENUITEM "&Connect...\tF1",             ID_CONNECT
+        MENUITEM "&Reconnect\tF2",              ID_REC, INACTIVE
+        MENUITEM "&Disconnect\tF3",             ID_DISC, GRAYED
+        MENUITEM "&Beep\tF4",                   ID_BEEP, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
     POPUP "&Edit"
     BEGIN
-        MENUITEM "Cu&t",                        ID_EDIT_CUT
-        MENUITEM "&Copy",                       ID_EDIT_COPY
-        MENUITEM "&Paste",                      ID_EDIT_PASTE
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
         MENUITEM SEPARATOR
         POPUP "&Scrollbar"
         BEGIN
@@ -109,14 +109,14 @@ BEGIN
     END
     POPUP "&Option"
     BEGIN
-        MENUITEM "&Want to talk",               ID_WANTTALK
+        MENUITEM "&Want to talk\tCtrl+W",       ID_WANTTALK
         MENUITEM SEPARATOR
-        MENUITEM "&Setting...",                 ID_SETTING
+        MENUITEM "&Setting...\t",               ID_SETTING
         MENUITEM "&Font...",                    ID_FONT
         MENUITEM "&Background...",              ID_BACKCOLOR
         MENUITEM SEPARATOR
-        MENUITEM "&Address Book..",             ID_ADDRBOOK
-        MENUITEM "&Log list..",                 ID_LOG
+        MENUITEM "&Address Book..\tF5",         ID_ADDRBOOK
+        MENUITEM "&Log list..\tF6",             ID_LOG
     END
     POPUP "&Help"
     BEGIN
@@ -149,7 +149,7 @@ FONT 9, "宋体"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,10,10,20,20
     CTEXT           "AndyTalk v3.0",IDC_STATIC,42,13,100,8,SS_NOPREFIX
-    CTEXT           "2000.5.20 (小小改动)",IDC_STATIC,47,25,95,8
+    CTEXT           "2000.12.23",IDC_STATIC,32,25,123,8
     DEFPUSHBUTTON   "确定",IDOK,152,7,50,14,WS_GROUP
 END
 
@@ -237,10 +237,10 @@ BEGIN
                     ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
 END
 
-IDD_CFG_GENERAL DIALOGEX 0, 0, 300, 181
+IDD_CFG_GENERAL DIALOG DISCARDABLE  0, 0, 300, 181
 STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "General"
-FONT 9, "宋体", 0, 0, 0x1
+FONT 9, "宋体"
 BEGIN
     GROUPBOX        "My &name:",IDC_STATIC,4,6,82,34
     EDITTEXT        IDC_MYNAME,10,20,70,12,ES_AUTOHSCROLL
@@ -258,7 +258,7 @@ BEGIN
                     UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
                     UDS_ARROWKEYS | UDS_HOTTRACK,195,35,11,10
     LTEXT           "times",IDC_STATIC,153,36,34,11
-    GROUPBOX        "Miscellaneous:",IDC_STATIC,2,52,296,128
+    GROUPBOX        "Miscellaneous:",IDC_STATIC,2,52,297,94
     CONTROL         "&Max connections allowed",IDC_STATIC,"Static",
                     SS_LEFTNOWORDWRAP | SS_CENTERIMAGE | WS_GROUP,6,70,99,12
     EDITTEXT        IDC_MAXCONN,110,70,35,12,ES_AUTOHSCROLL | ES_NUMBER | 
@@ -288,6 +288,15 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,8,116,194,12
     CONTROL         "&Auto load at Windows startup",IDC_STARTUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,8,130,210,12
+    GROUPBOX        "Emote keys:",IDC_STATIC,2,151,297,30
+    LTEXT           "1:",IDC_STATIC,7,164,13,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTE1,21,164,16,13,ES_CENTER
+    LTEXT           "2:",IDC_STATIC,47,164,11,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTE2,59,164,16,13,ES_CENTER
+    LTEXT           "3:",IDC_STATIC,85,164,14,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTE3,100,164,16,13,ES_CENTER
+    LTEXT           "Escape key:",IDC_STATIC,126,164,52,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTEESC,177,164,16,13,ES_CENTER
 END
 
 IDD_PERSONAL DIALOG DISCARDABLE  0, 0, 300, 181
@@ -443,8 +452,28 @@ IDB_TOOLBAR             BITMAP  DISCARDABLE     "res\\Toolbar.bmp"
 // WAVE
 //
 
-IDR_NOTIFY              WAVE    DISCARDABLE     "res\\Notify.wav"
 IDR_LOGOUT              WAVE    DISCARDABLE     "res\\ohoh.wav"
+IDR_NOTIFY              WAVE    DISCARDABLE     "res\\ringout.wav"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS DISCARDABLE 
+BEGIN
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_F1,          ID_CONNECT,             VIRTKEY, NOINVERT
+    VK_F2,          ID_REC,                 VIRTKEY, NOINVERT
+    VK_F3,          ID_DISC,                VIRTKEY, NOINVERT
+    VK_F4,          ID_BEEP,                VIRTKEY, NOINVERT
+    VK_F5,          ID_ADDRBOOK,            VIRTKEY, NOINVERT
+    VK_F6,          ID_LOG,                 VIRTKEY, NOINVERT
+    "W",            ID_WANTTALK,            VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

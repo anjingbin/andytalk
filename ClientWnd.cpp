@@ -290,7 +290,7 @@ int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_nNewLog=CheckNew();
 	SetTrayIcon();
-
+/*
 	if(m_nNewLog>0){
 		CString str;
 		if(m_nNewLog==1)
@@ -300,7 +300,7 @@ int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		AfxMessageBox(CString("You have got ")+str+" new message!");
 		SendMessage(WM_COMMAND,ID_LOG);
 	}
-
+*/
 	return 0;
 }
 
@@ -370,6 +370,7 @@ void CClientWnd::ProcessOnAccept(int nErrorCode)
 		return;
 	}
 
+	pSock->AsyncSelect(FD_READ|FD_CLOSE|FD_WRITE);
 	pSock->m_MyPos=TSL.AddTail(pSock);
 	pSock->m_nStatus=S_CONNECTED;
 	pSock->m_nElapsedTime=0;
@@ -706,6 +707,7 @@ void CClientWnd::OnWanttalk()
 {
 	m_bWantTalk=!m_bWantTalk;
 	SetTrayIcon();
+/*
 	if(m_bWantTalk){
 		int New=m_nNewLog;
 		if(New){
@@ -719,6 +721,7 @@ void CClientWnd::OnWanttalk()
 			SendMessage(WM_COMMAND,ID_LOG);
 		}
 	}
+*/
 }
 
 void CClientWnd::OnTimer(UINT nIDEvent) 
@@ -787,7 +790,7 @@ void CClientWnd::OnTimer(UINT nIDEvent)
 			break;
 		case S_CONNECTED:	
 		case S_VERSIONOK:		
-			if(pSock->m_nElapsedTime>=100)
+			if(pSock->m_nElapsedTime>=1000)
 				CloseSocket(pSock);
 			break;
 		case S_NAMEOK:	
@@ -889,6 +892,10 @@ void CClientWnd::OnSetting()
 	cg.m_time2		=m_Config.nConfirmTime	;
 	cg.m_nRetry		=m_Config.nRetry;
 	cg.m_nRetryInterval		=m_Config.nRetryInterval;
+	cg.m_Emote1		=CString(m_Config.m_Emote1);
+	cg.m_Emote2		=CString(m_Config.m_Emote2);
+	cg.m_Emote3		=CString(m_Config.m_Emote3);
+	cg.m_EmoteEsc		=CString(m_Config.m_EmoteEsc);
 
 	HKEY hKey=NULL;
 	char * ValueName="AndyTalk";
@@ -936,6 +943,10 @@ void CClientWnd::OnSetting()
 	m_Config.nConfirmTime		=cg.m_time2	;
 	m_Config.nRetry		=cg.m_nRetry;
 	m_Config.nRetryInterval =cg.m_nRetryInterval;
+	m_Config.m_Emote1=cg.m_Emote1.GetLength()>0?cg.m_Emote1[0]:0;
+	m_Config.m_Emote2=cg.m_Emote2.GetLength()>0?cg.m_Emote2[0]:0;
+	m_Config.m_Emote3=cg.m_Emote3.GetLength()>0?cg.m_Emote3[0]:0;
+	m_Config.m_EmoteEsc=cg.m_EmoteEsc.GetLength()>0?cg.m_EmoteEsc[0]:0;
 
 	if(!cg.m_startup){
 		RegDeleteValue(hKey,ValueName);
@@ -1398,7 +1409,7 @@ void CClientWnd::ProcessMessage(CTalkSock* pSock,MESSAGE msg)
 		}		
 	}
 
-	if(i!=LB_ERR && msg.bCommand==8 && m_bWantTalk && pSock->m_bWantTalk)
+	if(i!=LB_ERR && msg.bCommand==8 )//&& m_bWantTalk && pSock->m_bWantTalk)
 		NotifySound(1);
 
 	//on message received	
@@ -1509,6 +1520,7 @@ void CClientWnd::ProcessOnConnect(CTalkSock* pSock,int nErrorCode)
 	}else{	//connected successfully
 		pSock->m_nStatus=S_CONNECTED;
 		pSock->m_nElapsedTime=0;
+		pSock->AsyncSelect(FD_READ|FD_WRITE|FD_CLOSE);
 
 		UINT port;
 		CString ip;
@@ -1521,7 +1533,7 @@ void CClientWnd::ProcessOnConnect(CTalkSock* pSock,int nErrorCode)
 
 void CClientWnd::NotifySound(int nType)
 {
-	MessageBeep(-1);
+//	MessageBeep(-1);
 	if(nType==1)
 		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
 	if(nType==0)

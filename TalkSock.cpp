@@ -397,8 +397,7 @@ void CTalkSock::SendMessage(MESSAGE_S *pMsg)
 	if(m_nStatus==S_NAMEOK)
 		m_nIdleTime=0;
 	m_OutMsgList.AddTail(pMsg);
-	if(!m_OutMsgList.IsEmpty())
-		OnSend(0);
+	AsyncSelect(FD_READ|FD_WRITE|FD_CLOSE);
 }
 
 

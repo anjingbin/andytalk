@@ -2,7 +2,7 @@
 
 [General Info]
 Version=1
-LastClass=CABDlg
+LastClass=CCfgGen
 LastTemplate=CDialog
 NewFileInclude1=#include "stdafx.h"
 NewFileInclude2=#include "talk.h"
@@ -33,18 +33,18 @@ Class21=CAboutDlg
 Class22=CTalkSock
 
 ResourceCount=12
-Resource1=IDR_TRAYMENU
-Resource2=IDR_MAINFRAME
-Resource3=IDD_CONNECT
-Resource4=IDD_ADDRBOOK
-Resource5=IDD_PERSONAL
-Resource6=IDD_CFG_GENERAL
-Resource7=IDD_CFG_MSG_3
-Resource8=IDD_LOG
-Resource9=IDD_ABOUTBOX
-Resource10=IDD_VIEW
-Resource11=IDD_CFG_MSG_1
-Resource12=IDD_CONFIRM
+Resource1=IDD_CONFIRM
+Resource2=IDD_PERSONAL
+Resource3=IDR_MAINFRAME
+Resource4=IDR_TRAYMENU
+Resource5=IDD_CFG_MSG_3
+Resource6=IDD_CONNECT
+Resource7=IDD_CFG_MSG_1
+Resource8=IDD_CFG_GENERAL
+Resource9=IDD_ADDRBOOK
+Resource10=IDD_LOG
+Resource11=IDD_VIEW
+Resource12=IDD_ABOUTBOX
 
 [CLS:CABDlg]
 Type=0
@@ -69,7 +69,7 @@ Type=0
 BaseClass=CPropertyPage
 HeaderFile=CfgGen.h
 ImplementationFile=CfgGen.cpp
-LastObject=IDC_RI_SPIN
+LastObject=IDC_EMOTE1
 Filter=D
 VirtualFilter=idWC
 
@@ -234,7 +234,7 @@ Control4=IDCANCEL,button,1342242816
 [DLG:IDD_CFG_GENERAL]
 Type=1
 Class=CCfgGen
-ControlCount=25
+ControlCount=34
 Control1=IDC_STATIC,button,1342177287
 Control2=IDC_MYNAME,edit,1350631552
 Control3=IDC_STATIC,button,1342177287
@@ -260,6 +260,15 @@ Control22=IDC_SPIN3,msctls_updown32,1342177719
 Control23=IDC_STATIC,static,1342308864
 Control24=IDC_BEEP,button,1342242819
 Control25=IDC_STARTUP,button,1342242819
+Control26=IDC_STATIC,button,1342177287
+Control27=IDC_STATIC,static,1342308864
+Control28=IDC_EMOTE1,edit,1350631425
+Control29=IDC_STATIC,static,1342308864
+Control30=IDC_EMOTE2,edit,1350631425
+Control31=IDC_STATIC,static,1342308864
+Control32=IDC_EMOTE3,edit,1350631425
+Control33=IDC_STATIC,static,1342308864
+Control34=IDC_EMOTEESC,edit,1350631425
 
 [DLG:IDD_PERSONAL]
 Type=1
@@ -353,4 +362,19 @@ Command2=ID_SETTING
 Command3=ID_APP_EXIT
 Command4=ID_APP_ABOUT
 CommandCount=4
+
+[ACL:IDR_MAINFRAME]
+Type=1
+Class=?
+Command1=ID_EDIT_COPY
+Command2=ID_EDIT_PASTE
+Command3=ID_CONNECT
+Command4=ID_REC
+Command5=ID_DISC
+Command6=ID_BEEP
+Command7=ID_ADDRBOOK
+Command8=ID_LOG
+Command9=ID_WANTTALK
+Command10=ID_EDIT_CUT
+CommandCount=10
 

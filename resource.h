@@ -86,6 +86,10 @@
 #define IDC_RETRYINTERVAL               1048
 #define IDC_SPIN6                       1049
 #define IDC_RETRY2                      1050
+#define IDC_EMOTE1                      1050
+#define IDC_EMOTE2                      1051
+#define IDC_EMOTE3                      1052
+#define IDC_EMOTEESC                    1053
 #define ID_CONNECT                      32772
 #define ID_CUT                          32773
 #define ID_COPY                         32774
@@ -109,9 +113,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        170
+#define _APS_NEXT_RESOURCE_VALUE        174
 #define _APS_NEXT_COMMAND_VALUE         32797
-#define _APS_NEXT_CONTROL_VALUE         1049
+#define _APS_NEXT_CONTROL_VALUE         1051
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

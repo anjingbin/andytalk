@@ -34,6 +34,10 @@ public:
 	int		m_nRetry;
 	int		m_nRetryInterval;
 	BOOL	m_beep;
+	CString	m_Emote1;
+	CString	m_Emote2;
+	CString	m_Emote3;
+	CString	m_EmoteEsc;
 	//}}AFX_DATA
 
 

@@ -207,6 +207,10 @@ void CLogDlg::OnLogDel()
 		int count=m_List.GetItemCount();
 		if(!count)
 			return;
+
+		if(AfxMessageBox("Do you really want to delete all old log items?",MB_YESNO)!=IDYES)
+			return;
+
 		int k=0;
 		for(int i=0;i<count;i++){
 			pos=(POSITION)m_List.GetItemData(k);
