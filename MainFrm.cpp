@@ -27,6 +27,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_ICON_NOTIFY,OnTrayNotify)      
 	ON_MESSAGE(WM_HOTKEY,OnHotKey)      
+    ON_REGISTERED_MESSAGE(WM_TASKBARCREATED, OnTaskBarCreated)
 END_MESSAGE_MAP()
 
 
@@ -325,4 +326,23 @@ LRESULT	CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
 	}
 	return true;
 
+}
+
+LRESULT CMainFrame::OnTaskBarCreated(WPARAM wParam, LPARAM lParam)
+{
+    m_NID.cbSize = sizeof(NOTIFYICONDATA);
+    m_NID.hWnd   = GetSafeHwnd();
+    m_NID.uID    = IDR_TRAYMENU;
+    m_NID.hIcon  = AfxGetApp()->LoadIcon(IDI_ICON4);
+    m_NID.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+    m_NID.uCallbackMessage =WM_ICON_NOTIFY;
+    strcpy(m_NID.szTip,"AndyTalk(CTRL+ALT+INS)");
+
+	if(!m_NID.hWnd)
+		return -1;
+
+	if(!Shell_NotifyIcon(NIM_ADD, &m_NID))
+		return -1;
+
+	return 0;
 }

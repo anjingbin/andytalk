@@ -31,17 +31,17 @@ Class19=CAboutDlg
 Class20=CTalkSock
 
 ResourceCount=12
-Resource1=IDD_ABOUTBOX
-Resource2=IDD_CFG_MSG_3
-Resource3=IDD_CONFIRM
-Resource4=IDD_CONNECT
-Resource5=IDD_ADDRBOOK
-Resource6=IDD_CFG_MSG_1
-Resource7=IDD_CFG_GENERAL
-Resource8=IDR_TRAYMENU
-Resource9=IDD_PERSONAL
-Resource10=IDD_LOG
-Resource11=IDD_VIEW
+Resource1=IDR_TRAYMENU
+Resource2=IDD_CFG_GENERAL
+Resource3=IDD_PERSONAL
+Resource4=IDD_ADDRBOOK
+Resource5=IDD_ABOUTBOX
+Resource6=IDD_VIEW
+Resource7=IDD_CFG_MSG_3
+Resource8=IDD_CONFIRM
+Resource9=IDD_CFG_MSG_1
+Resource10=IDD_CONNECT
+Resource11=IDD_LOG
 Resource12=IDR_MAINFRAME
 
 [CLS:CABDlg]

@@ -1439,14 +1439,12 @@ void CClientWnd::ProcessMessage(CTalkSock* pSock,MESSAGE msg)
 		if(bInvisible && !pSock->m_bConfirming){
 			if(m_Config.bBeep){
 				NotifySound(-1);
-				pMain->FlashWindow(TRUE);
-			}else{ 
-				if(!pMain->IsWindowVisible()){
-					AfxGetMainWnd()->ShowWindow(SW_SHOW);
-					AfxGetMainWnd()->ShowWindow(SW_RESTORE);
-				}
-				pMain->SetForegroundWindow();
+			} 
+			if(!pMain->IsWindowVisible()){
+				AfxGetMainWnd()->ShowWindow(SW_SHOW);
 			}
+			pMain->FlashWindow(TRUE);
+			
 		}
 	}
 
@@ -1557,7 +1555,7 @@ void CClientWnd::ProcessOnConnect(CTalkSock* pSock,int nErrorCode)
 void CClientWnd::NotifySound(int nType)
 {
 	// beep the speaker,by Andy,2002/11/15
-	//Beep(500,100);
+	Beep(500,100);
 	if(nType==1)
 		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
 	if(nType==0)

@@ -20,6 +20,8 @@
 // CTalkApp:
 // See talk.cpp for the implementation of this class
 //
+const UINT WM_TASKBARCREATED = 
+    ::RegisterWindowMessage(_T("TaskbarCreated"));
 
 class CTalkApp : public CWinApp
 { 
