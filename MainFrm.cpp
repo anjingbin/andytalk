@@ -108,6 +108,37 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetIcon(AfxGetApp()->LoadIcon(IDI_ICON4),true);
 	SetIcon(AfxGetApp()->LoadIcon(IDI_ICON4),false);
 
+///////////////////////////////////////////
+
+	CMenu* pMenu=GetMenu();
+	if(pMenu)
+	{
+		CMenu * pOption=pMenu->GetSubMenu(2);
+		HMENU hMenu=pOption->GetSafeHmenu();
+		if(hMenu)
+		{
+			MENUITEMINFO mii;
+			mii.cbSize=sizeof(mii);
+			mii.fMask=MIIM_SUBMENU;
+
+			m_menuWelMsg.CreatePopupMenu();
+			m_menuWelMsg.AppendMenu(MF_CHECKED|MF_ENABLED|MF_STRING,100,"fhdjsalhrk");
+			m_menuWelMsg.AppendMenu(MF_ENABLED|MF_STRING,101,"fhdjsalhrk");
+			m_menuWelMsg.AppendMenu(MF_ENABLED|MF_STRING,102,"fhdjsalhrk");
+			m_menuWelMsg.AppendMenu(MF_ENABLED|MF_STRING,103,"fhdjsalhrk");
+			m_menuWelMsg.AppendMenu(MF_ENABLED|MF_STRING,104,"fhdjsalhrk");
+
+			mii.hSubMenu=m_menuWelMsg.GetSafeHmenu();
+			
+			if(!SetMenuItemInfo(hMenu,ID_WELMSG,false,&mii)){
+				int err=::GetLastError();
+				AfxMessageBox("failed!");
+			}
+		}
+
+	}	
+
+///////////////////////////////////////////
 	return 0;
 }
 
@@ -146,6 +177,12 @@ void CMainFrame::OnSetFocus(CWnd* pOldWnd)
 
 BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo)
 {
+	if(nID>=100 && nID<200)
+	{
+		m_menuWelMsg.ModifyMenu(nID,MF_BYCOMMAND|MF_CHECKED);
+		return true;
+	}
+
 	//we process all commands in client window
 	if (m_wndClient.OnCmdMsg(nID, nCode, pExtra, pHandlerInfo))
 		return TRUE;
@@ -252,3 +289,5 @@ void CMainFrame::SetTrayIcon(int nID)
 	Shell_NotifyIcon(NIM_MODIFY, &m_NID);
 	return;
 }
+
+

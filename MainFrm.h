@@ -58,6 +58,8 @@ protected:
 	//}}AFX_MSG
 	afx_msg void OnTrayNotify(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+private:
+	CMenu m_menuWelMsg;
 };
 
 /////////////////////////////////////////////////////////////////////////////

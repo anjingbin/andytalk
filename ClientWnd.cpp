@@ -290,7 +290,7 @@ int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_nNewLog=CheckNew();
 	SetTrayIcon();
-/*
+
 	if(m_nNewLog>0){
 		CString str;
 		if(m_nNewLog==1)
@@ -300,7 +300,7 @@ int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		AfxMessageBox(CString("You have got ")+str+" new message!");
 		SendMessage(WM_COMMAND,ID_LOG);
 	}
-*/
+
 	return 0;
 }
 
@@ -707,7 +707,6 @@ void CClientWnd::OnWanttalk()
 {
 	m_bWantTalk=!m_bWantTalk;
 	SetTrayIcon();
-/*
 	if(m_bWantTalk){
 		int New=m_nNewLog;
 		if(New){
@@ -721,7 +720,6 @@ void CClientWnd::OnWanttalk()
 			SendMessage(WM_COMMAND,ID_LOG);
 		}
 	}
-*/
 }
 
 void CClientWnd::OnTimer(UINT nIDEvent) 
@@ -1409,7 +1407,7 @@ void CClientWnd::ProcessMessage(CTalkSock* pSock,MESSAGE msg)
 		}		
 	}
 
-	if(i!=LB_ERR && msg.bCommand==8 )//&& m_bWantTalk && pSock->m_bWantTalk)
+	if(i!=LB_ERR && msg.bCommand==8 && m_bWantTalk && pSock->m_bWantTalk)
 		NotifySound(1);
 
 	//on message received	
@@ -1533,7 +1531,7 @@ void CClientWnd::ProcessOnConnect(CTalkSock* pSock,int nErrorCode)
 
 void CClientWnd::NotifySound(int nType)
 {
-//	MessageBeep(-1);
+	MessageBeep(-1);
 	if(nType==1)
 		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
 	if(nType==0)
@@ -1913,3 +1911,5 @@ BOOL CClientWnd::getline(CString &str,FILE * fp)
 		str=buffer.Left(i);
 	return true;
 }
+
+

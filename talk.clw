@@ -2,13 +2,13 @@
 
 [General Info]
 Version=1
-LastClass=CCfgGen
+LastClass=CABDlg
 LastTemplate=CDialog
 NewFileInclude1=#include "stdafx.h"
 NewFileInclude2=#include "talk.h"
 LastPage=0
 
-ClassCount=22
+ClassCount=20
 Class1=CABDlg
 Class2=CCDlg
 Class3=CCfgGen
@@ -16,71 +16,58 @@ Class4=CCfgPersonal
 Class5=CClientWnd
 Class6=CConfirm
 Class7=CInplaceEdit
-Class8=CInputCombo
-Class9=CListenSock
-Class10=CLocalOut
-Class11=CLogDlg
-Class12=CLogView
-Class13=CMainFrame
-Class14=CMsgPageA
-Class15=CMsgPageB
-Class16=CMsgPageW
-Class17=COutlookBar
-Class18=CRemoteOut
-Class19=CSystemTray
-Class20=CTalkApp
-Class21=CAboutDlg
-Class22=CTalkSock
+Class8=CListenSock
+Class9=CLocalOut
+Class10=CLogDlg
+Class11=CLogView
+Class12=CMainFrame
+Class13=CMsgPageA
+Class14=CMsgPageB
+Class15=CMsgPageW
+Class16=COutlookBar
+Class17=CRemoteOut
+Class18=CTalkApp
+Class19=CAboutDlg
+Class20=CTalkSock
 
 ResourceCount=12
 Resource1=IDD_CONFIRM
-Resource2=IDD_PERSONAL
-Resource3=IDR_MAINFRAME
-Resource4=IDR_TRAYMENU
-Resource5=IDD_CFG_MSG_3
-Resource6=IDD_CONNECT
-Resource7=IDD_CFG_MSG_1
-Resource8=IDD_CFG_GENERAL
-Resource9=IDD_ADDRBOOK
-Resource10=IDD_LOG
-Resource11=IDD_VIEW
-Resource12=IDD_ABOUTBOX
+Resource2=IDR_TRAYMENU
+Resource3=IDD_ABOUTBOX
+Resource4=IDD_ADDRBOOK
+Resource5=IDD_CONNECT
+Resource6=IDD_LOG
+Resource7=IDD_VIEW
+Resource8=IDD_CFG_MSG_1
+Resource9=IDD_CFG_MSG_3
+Resource10=IDD_CFG_GENERAL
+Resource11=IDD_PERSONAL
+Resource12=IDR_MAINFRAME
 
 [CLS:CABDlg]
 Type=0
 BaseClass=CDialog
 HeaderFile=ABDlg.h
 ImplementationFile=ABDlg.cpp
-LastObject=IDC_TIME
-Filter=D
-VirtualFilter=dWC
+LastObject=CABDlg
 
 [CLS:CCDlg]
 Type=0
 BaseClass=CDialog
 HeaderFile=CDlg.h
 ImplementationFile=CDlg.cpp
-LastObject=IDC_EDIT1
-Filter=D
-VirtualFilter=dWC
 
 [CLS:CCfgGen]
 Type=0
 BaseClass=CPropertyPage
 HeaderFile=CfgGen.h
 ImplementationFile=CfgGen.cpp
-LastObject=IDC_EMOTE1
-Filter=D
-VirtualFilter=idWC
 
 [CLS:CCfgPersonal]
 Type=0
 BaseClass=CPropertyPage
 HeaderFile=CfgPersonal.h
 ImplementationFile=CfgPersonal.cpp
-Filter=D
-VirtualFilter=idWC
-LastObject=IDC_WELMSG
 
 [CLS:CClientWnd]
 Type=0
@@ -95,20 +82,12 @@ Type=0
 BaseClass=CDialog
 HeaderFile=Confirm.h
 ImplementationFile=Confirm.cpp
-Filter=T
-VirtualFilter=dWC
 
 [CLS:CInplaceEdit]
 Type=0
 BaseClass=CEdit
 HeaderFile=InplaceEdit.h
 ImplementationFile=InplaceEdit.cpp
-
-[CLS:CInputCombo]
-Type=0
-BaseClass=CComboBox
-HeaderFile=InputCombo.h
-ImplementationFile=InputCombo.cpp
 
 [CLS:CListenSock]
 Type=0
@@ -127,8 +106,6 @@ Type=0
 BaseClass=CDialog
 HeaderFile=LogDlg.h
 ImplementationFile=LogDlg.cpp
-Filter=D
-VirtualFilter=dWC
 
 [CLS:CLogView]
 Type=0
@@ -141,6 +118,8 @@ Type=0
 BaseClass=CFrameWnd
 HeaderFile=MainFrm.h
 ImplementationFile=MainFrm.cpp
+Filter=T
+VirtualFilter=fWC
 
 [CLS:CMsgPageA]
 Type=0
@@ -153,17 +132,12 @@ Type=0
 BaseClass=CPropertyPage
 HeaderFile=MsgPageB.h
 ImplementationFile=MsgPageB.cpp
-Filter=D
-VirtualFilter=idWC
 
 [CLS:CMsgPageW]
 Type=0
 BaseClass=CPropertyPage
 HeaderFile=MsgPageW.h
 ImplementationFile=MsgPageW.cpp
-Filter=D
-VirtualFilter=idWC
-LastObject=CMsgPageW
 
 [CLS:COutlookBar]
 Type=0
@@ -177,12 +151,6 @@ BaseClass=CEdit
 HeaderFile=RemoteOut.h
 ImplementationFile=RemoteOut.cpp
 
-[CLS:CSystemTray]
-Type=0
-BaseClass=CWnd
-HeaderFile=SystemTray.h
-ImplementationFile=SystemTray.cpp
-
 [CLS:CTalkApp]
 Type=0
 BaseClass=CWinApp
@@ -194,15 +162,12 @@ Type=0
 BaseClass=CDialog
 HeaderFile=talk.cpp
 ImplementationFile=talk.cpp
-LastObject=CAboutDlg
 
 [CLS:CTalkSock]
 Type=0
 BaseClass=CAsyncSocket
 HeaderFile=TalkSock.h
 ImplementationFile=TalkSock.cpp
-Filter=N
-VirtualFilter=q
 
 [DLG:IDD_ADDRBOOK]
 Type=1
@@ -313,7 +278,7 @@ Control3=IDC_LOCAL,edit,1353783492
 
 [DLG:IDD_CFG_MSG_3]
 Type=1
-Class=CMsgPageB
+Class=CMsgPageA
 ControlCount=1
 Control1=IDC_EDIT,edit,1353781444
 
@@ -351,8 +316,9 @@ Command13=ID_FONT
 Command14=ID_BACKCOLOR
 Command15=ID_ADDRBOOK
 Command16=ID_LOG
-Command17=ID_APP_ABOUT
-CommandCount=17
+Command17=ID_WELMSG
+Command18=ID_APP_ABOUT
+CommandCount=18
 
 [MNU:IDR_TRAYMENU]
 Type=1
