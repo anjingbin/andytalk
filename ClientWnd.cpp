@@ -279,7 +279,7 @@ int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	m_pListenSock = new CListenSock(this);
-	if (!m_pListenSock->Create(PORT)){
+	if (!m_pListenSock->Create(888)){
 		AfxMessageBox("Server socket create failed, maybe AndyTalk is already running!");
 		return -1;
 	}

@@ -1,0 +1,64 @@
+#Change Logs by pubb since 2002.03.04
+2002.03.04.10:41
+	Alternated some files listed in Workspace: deleted non-existent 'protocal.htm',
+	changed mis-spelling 'protocal.txt' to 'protocal.txt', added a 'ChangeLog.txt',
+	eg. this file.
+2002.03.04.13:08
+	Fix a conherent bug on PORT macro references. ClientWnd.cpp #620, ClientWnd::Connect(), 
+	direct IP connection request.
+2002.03.04.13:10
+	Multi-selection Delete in Logs Dialog.
+2002.03.04.13:54
+	Multi-selection AddtoAddressBook in Logs Dialog, allowing update new name-ip pair to Address Book.
+2002.03.05.15:28
+	Create a popup menu for 'Merge' and 'Encrypt' in Log Dialog.
+2002.03.09.20:40
+	Add a tip on 'Save' button for 'shift-save to update' in Addressbook Dialog.
+2002.03.12.13:15
+	Almost over with 'logs merge and expand'.
+2002.03.12.16:05
+	Make PORT changable in Makefile using '#ifndef PORT...#endif'.
+2002.03.12.17:20
+	Add a 'Make album' function using Merge.
+2002.03.12.22:00
+	Fix Reconnect and add-to-addressbook action in Log dialog for 'multiple IPs' entries.
+2002.03.13.17:40
+	Add AES encryption engine support.
+2002.03.14.17:40
+	Almost done with Encryption, goto bug fix
+2002.03.14.22:30
+	Encrypted text may contains 0x00, so do CharStr<->HexStr conversion before processing as CString.Done.
+2002.03.15.09:45
+	Found a Bug in AddressBook entry-add, should set default values to bWelMsg and bLvWord as 'false'.
+2002.03.15.09:50
+	Fix a bug in CRijndael class Constructor, m_ROUNDS should be initialized to negative, so as to avoid destruction to delete NULL
+2002.03.16.15:50
+	According to Andy's suggestion,let config.dat to store encryption key and decryption key created from inputed password. So we needn't to input password everytime as well as protect the logs
+2002.03.17.10:22
+	Optimize the interface.
+2002.03.20.11:30
+	Rearrange the Log class to do Log file operations.
+2002.03.20.16:00
+	Complete log file 'import' and 'export', with a logfile enlarging bug remains.
+2002.03.21.10:30
+	logfile enlarging bug fixed. The cause is 'strncpy', the src should be empty to zero too.
+2002.03.21.11:11
+	logfile 'import' can do with 'pure logs'
+2002.03.21.13:20
+	Andy optimized 'delete all' operation in Log Dialog.
+2002.03.21.14:50
+	Changed the log file format to log_mm-dd-yy.dat. Import to the header of the Log list.
+2002.03.22.10:50
+	Dont store Decrypt key in the Config file, for security concern.
+2002.04.09.19:50
+    Fix a bug when 'update' in addressbook in ABdialog, as well as almost the same bug in LogDialog. 
+2002.04.09.20:10
+    Fix a bug in synchronize between mList and mHost in AdressBook dialog when Insert a new entry.
+2002.04.10.09:50
+    Do complain when config/addressbook/log does not match correctly with Win32 API ::MessageBox() and exception catch
+2002.04.18.13:00
+    According to 'noway''s suggestion, empty mHost and mName when 'save' in ABdialog.
+2002.04.30.21:09 (by Andy)
+	Corrected the "EPassDlg" mistake. Old password dialog class is named as "EPassDlg" by mistake.
+2002.04.30.21:57 (by Andy)
+	Added: hot-key "Ctrl+Tab" to switch current session circularly.
