@@ -684,6 +684,9 @@ void CClientWnd::OnDisc()
 		TSL.RemoveAt(pSock->m_MyPos);
 		delete pSock;
 		m_wndBar.DeleteListString(i);
+
+		SetTrayIcon(); //Added by andy,2k1.5.12
+
 		if(m_wndBar.GetCount()){
 			if(m_wndBar.SetCurSel(i)==LB_ERR)
 				m_wndBar.SetCurSel(0);
@@ -936,6 +939,19 @@ void CClientWnd::OnSetting()
 
 	m_Config.sWelMsg=pw.m_msg;
 	m_Config.sAbsentMsg=pa.m_msg;
+/*
+	char * str;
+	str=(char*)malloc(pa.m_msg.GetLength()+3);
+	ZeroMemory(str,pa.m_msg.GetLength()+3);
+	strcpy(str+2,pa.m_msg);
+	str[0]=0x0d;
+	str[1]=0x0a;
+
+	char* msg=strstr(str,"\r\n>>>");
+	msg+=5;
+	strchr(
+*/
+
 	m_Config.bBeep			=cg.m_beep	;
 	m_Config.nMaxConnections	=cg.m_max	;
 	m_Config.sMyName			=cg.m_name	;
@@ -1190,6 +1206,9 @@ int CClientWnd::AddBarItem(CString sText, int nIcon,POSITION Pos)
 		}
 
 	m_wndBar.InsertString(i,sText,nIcon);
+
+	SetTrayIcon(); //Added by andy,2k1.5.12
+	
 	m_wndBar.SetItemData(i,(DWORD)Pos);
 	m_wndBar.SetCurSel(i);			
 	UpdateView();
@@ -1409,6 +1428,7 @@ void CClientWnd::ProcessMessage(CTalkSock* pSock,MESSAGE msg)
 		}		
 	}
 
+	//ring the bell!
 	if(i!=LB_ERR && msg.bCommand==8 )//&& m_bWantTalk && pSock->m_bWantTalk)
 		NotifySound(1);
 
@@ -1533,7 +1553,7 @@ void CClientWnd::ProcessOnConnect(CTalkSock* pSock,int nErrorCode)
 
 void CClientWnd::NotifySound(int nType)
 {
-//	MessageBeep(-1);
+	printf("\7\7\7\7");
 	if(nType==1)
 		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
 	if(nType==0)
@@ -1545,7 +1565,12 @@ void CClientWnd::SetTrayIcon()
 	CMainFrame* pMain=(CMainFrame*)AfxGetMainWnd();
 	if(!pMain)
 		return;
-	if(m_nNewLog>0){
+
+//Added by andy,2k1.5.12
+	int nBarItem=m_wndBar.GetCount();
+	if(nBarItem>0){
+
+//	if(m_nNewLog>0){
 		if(m_bWantTalk)
 			pMain->SetTrayIcon(IDI_ACTIVE);
 		else
@@ -1645,7 +1670,10 @@ void CClientWnd::CloseSocket(CTalkSock *pSock)
 			logar<<count+1;
 			logar.Flush();
 			logar.GetFile()->SeekToEnd();
-			logar<<pSock->m_bNew;
+			// logar<<pSock->m_bNew;
+
+			logar<<false;  //modified on 2001/5/4. It seems useless and carking! :-( 
+
 			logar<<!pSock->m_bCallIn;
 			logar<<pSock->m_sIP;
 			logar<<pSock->m_sLocal<<pSock->m_sRemote;

@@ -55,9 +55,13 @@ protected:
 	afx_msg void OnSetFocus(CWnd *pOldWnd);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnClose();
+	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	afx_msg void OnTrayNotify(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+
+private:
+	BOOL m_bLeftDown;
 };
 
 /////////////////////////////////////////////////////////////////////////////

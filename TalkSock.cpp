@@ -84,6 +84,7 @@ void CTalkSock::OnReceive(int nErrorCode)
 		ret=Receive(&m_Msg+m_Msg.dwIndex,MESSAGE_HEADER_SIZE-m_Msg.dwIndex);
 		if(ret==SOCKET_ERROR)
 			return;
+
 		m_Msg.dwIndex+=ret;
 	}
 	if(m_Msg.dwIndex==MESSAGE_HEADER_SIZE){
@@ -96,13 +97,16 @@ void CTalkSock::OnReceive(int nErrorCode)
 		if(m_Msg.wLength==0){
 			OnMessage(m_Msg);
 			memset(&m_Msg,0,sizeof(MESSAGE));
+			AsyncSelect(FD_READ|FD_WRITE|FD_CLOSE);
 			return;
 		}
 	}
 	if(m_Msg.dwIndex>=MESSAGE_HEADER_SIZE){
 		ret=Receive(m_Msg.pBuf+m_Msg.dwIndex-MESSAGE_HEADER_SIZE,m_Msg.wLength+MESSAGE_HEADER_SIZE-m_Msg.dwIndex);
-		if(ret==SOCKET_ERROR)
+		if(ret==SOCKET_ERROR){
+			AsyncSelect(FD_READ|FD_WRITE|FD_CLOSE);
 			return;
+		}
 		m_Msg.dwIndex+=ret;
 
 		if(m_Msg.dwIndex==(DWORD)(m_Msg.wLength+MESSAGE_HEADER_SIZE)){
@@ -110,6 +114,8 @@ void CTalkSock::OnReceive(int nErrorCode)
 			memset(&m_Msg,0,sizeof(MESSAGE));
 		}
 	}
+
+	AsyncSelect(FD_READ|FD_WRITE|FD_CLOSE);
 }
 
 void CTalkSock::OnClose(int nErrorCode) 

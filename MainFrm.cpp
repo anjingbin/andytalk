@@ -23,6 +23,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_SETFOCUS()
 	ON_WM_SYSCOMMAND()
 	ON_WM_CLOSE()
+	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_ICON_NOTIFY,OnTrayNotify)      
 END_MESSAGE_MAP()
@@ -34,6 +35,7 @@ END_MESSAGE_MAP()
 
 CMainFrame::CMainFrame()
 {
+	m_bLeftDown=false;
 }
 
 CMainFrame::~CMainFrame()
@@ -196,6 +198,9 @@ void CMainFrame::OnTrayNotify(WPARAM wParam,LPARAM lParam)
 	} 
 	else if(LOWORD(lParam) == WM_LBUTTONDBLCLK) 
 	{
+		if(m_bLeftDown)
+			KillTimer(666);
+
 		SetForegroundWindow();  
 
 		UINT uItem;
@@ -203,15 +208,25 @@ void CMainFrame::OnTrayNotify(WPARAM wParam,LPARAM lParam)
 			return;
 		if (!(pSubMenu = menu.GetSubMenu(0))) 
 			return;
+
 		uItem = pSubMenu->GetMenuItemID(0);
+
 		SendMessage(WM_COMMAND, uItem, 0);
+
 		menu.DestroyMenu();
+
 	}else if(LOWORD(lParam) == WM_LBUTTONDOWN){
-		if(!IsWindowVisible()){
-			ShowWindow(SW_SHOW);
-			ShowWindow(SW_RESTORE);
+
+		m_bLeftDown=true;		
+
+		if(IsWindowVisible()){
+			HWND wnd=::GetActiveWindow();
+			if(wnd==GetSafeHwnd())
+				m_bLeftDown=3;
 		}
-		SetForegroundWindow();
+
+		SetTimer(666,GetDoubleClickTime(),NULL);	
+
 	}
 }
 
@@ -251,4 +266,29 @@ void CMainFrame::SetTrayIcon(int nID)
 
 	Shell_NotifyIcon(NIM_MODIFY, &m_NID);
 	return;
+}
+
+void CMainFrame::OnTimer(UINT nIDEvent) 
+{
+	if(nIDEvent==666){
+
+		if(!IsWindowVisible()){
+			ShowWindow(SW_SHOW);
+			ShowWindow(SW_RESTORE);
+			SetForegroundWindow();
+		}else{
+			if(m_bLeftDown!=3){
+				SetForegroundWindow();
+			}else{
+				SendMessage(WM_SYSCOMMAND,SC_CLOSE);
+			}
+
+		}
+
+		m_bLeftDown=false;
+		KillTimer(666);
+
+	}
+
+	CFrameWnd::OnTimer(nIDEvent);
 }

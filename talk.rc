@@ -130,6 +130,8 @@ BEGIN
     BEGIN
         MENUITEM "&Want to talk",               ID_WANTTALK
         MENUITEM "&Setting...",                 ID_SETTING
+        MENUITEM "&Log...",                     ID_LOG
+        MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
         MENUITEM SEPARATOR
         MENUITEM "&About",                      ID_APP_ABOUT
@@ -225,7 +227,8 @@ CAPTION "Welcome Message"
 FONT 9, "ËÎÌו"
 BEGIN
     EDITTEXT        IDC_EDIT,2,2,296,176,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL | 
+                    NOT WS_TABSTOP
 END
 
 IDD_CFG_MSG_3 DIALOG DISCARDABLE  0, 0, 300, 181
@@ -234,7 +237,8 @@ CAPTION "Absent Message"
 FONT 9, "ËÎÌו"
 BEGIN
     EDITTEXT        IDC_EDIT,2,2,296,176,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL | 
+                    NOT WS_TABSTOP
 END
 
 IDD_CFG_GENERAL DIALOG DISCARDABLE  0, 0, 300, 181
@@ -242,8 +246,8 @@ STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "General"
 FONT 9, "ËÎÌו"
 BEGIN
-    GROUPBOX        "My &name:",IDC_STATIC,4,6,82,34
-    EDITTEXT        IDC_MYNAME,10,20,70,12,ES_AUTOHSCROLL
+    GROUPBOX        "My &name:",IDC_STATIC,4,6,82,34,WS_TABSTOP
+    EDITTEXT        IDC_MYNAME,10,20,70,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
     GROUPBOX        "&Connect",IDC_STATIC,91,6,206,47
     LTEXT           "&Retry after",IDC_STATIC,97,20,49,9
     EDITTEXT        IDC_RETRYINTERVAL,149,18,28,12,ES_AUTOHSCROLL | 
