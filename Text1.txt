@@ -1,0 +1,13 @@
+			FILE * fp;
+			fp=fopen(m_pWnd->m_sPath+"log.txt","a+b");
+			if(fp){
+				fprintf(fp,"-----------------------------------------------\r\n");
+				fprintf(fp,"[%s:%s %s--%s]\r\n",
+					m_bCallIn?"From":"To",
+					m_sIP,
+					m_tBeginTime.Format("%H:%M:%S"),
+					m_tEndTime.Format("%H:%M:%S  %a,%b %d"));
+				fprintf(fp,"[Local:%s]\r\n%s\r\n",m_pWnd->Config.sMyName,m_sLocal);
+				fprintf(fp,"[Remote:%s]\r\n%s\r\n",m_sNickName,m_sRemote);
+				fclose(fp);
+			}

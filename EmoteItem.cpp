@@ -1,0 +1,27 @@
+// EmoteItem.cpp: implementation of the CEmoteItem class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "talk.h"
+#include "EmoteItem.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CEmoteItem::CEmoteItem()
+{
+
+}
+
+CEmoteItem::~CEmoteItem()
+{
+
+}

@@ -1,0 +1,5 @@
+// Microsoft Developer Studio generated Help ID include file.
+// Used by talk.rc
+//
+#define HIDC_BEEP                       0x809a0406    // IDD_CFG_GENERAL
+#define HIDC_NEED                       0x809a0403    // IDD_CFG_GENERAL

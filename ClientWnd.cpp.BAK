@@ -1,0 +1,1234 @@
+// ClientWnd.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "talk.h"
+#include "MainFrm.h"
+#include "SystemTray.h"
+#include "ClientWnd.h"
+#include "TalkSock.h"
+#include "ABItem.h"
+#include "ABDlg.h"
+#include "CDlg.h"
+#include "LogDlg.h"
+#include "LogItem.h"
+#include "MsgPageW.h"
+#include "MsgPageA.h"
+#include "MsgPageB.h"
+#include "CfgGen.h"
+#include "CfgPersonal.h"
+#include "mmsystem.h"
+#include "EmoteItem.h"
+
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// CClientWnd
+
+
+#define ABFILE "AddressBook.dat"
+#define LOGFILE "Log.dat"
+#define CFGFILE "Config.dat"
+
+CClientWnd::CClientWnd()
+{
+	m_psockListen=NULL;
+	m_bWantTalk=true;
+}
+
+CClientWnd::~CClientWnd()
+{
+	if(m_psockListen)
+		delete m_psockListen;
+}
+
+
+
+BEGIN_MESSAGE_MAP(CClientWnd, CWnd)
+	//{{AFX_MSG_MAP(CClientWnd)
+	ON_WM_ERASEBKGND()
+	ON_WM_CREATE()
+	ON_WM_SIZE()
+	ON_COMMAND(ID_ADDRBOOK, OnAddrbook)
+	ON_COMMAND(ID_CONNECT, OnConnect)
+	ON_COMMAND(ID_LOG, OnLog)
+	ON_UPDATE_COMMAND_UI(ID_BEEP, OnUpdateBeep)
+	ON_COMMAND(ID_BEEP, OnBeep)
+	ON_COMMAND(ID_DISC, OnDisc)
+	ON_UPDATE_COMMAND_UI(ID_DISC, OnUpdateDisc)
+	ON_UPDATE_COMMAND_UI(ID_WANTTALK, OnUpdateWanttalk)
+	ON_COMMAND(ID_WANTTALK, OnWanttalk)
+	ON_WM_TIMER()
+	ON_COMMAND(ID_SETTING, OnSetting)
+	ON_COMMAND(ID_FONT, OnFont)
+	ON_COMMAND(ID_BACKCOLOR, OnBackcolor)
+	ON_COMMAND(ID_HSCROLL, OnHscroll)
+	ON_COMMAND(ID_VSCROLL, OnVscroll)
+	ON_UPDATE_COMMAND_UI(ID_VSCROLL, OnUpdateVscroll)
+	ON_UPDATE_COMMAND_UI(ID_HSCROLL, OnUpdateHscroll)
+	ON_COMMAND(ID_SAVE, OnSave)
+	ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, OnUpdateEditCopy)
+	ON_COMMAND(ID_EDIT_CUT, OnEditCut)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, OnUpdateEditCut)
+	ON_COMMAND(ID_EDIT_PASTE, OnEditPaste)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, OnUpdateEditPaste)
+	ON_WM_SETFOCUS()
+	//}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+
+
+/////////////////////////////////////////////////////////////////////////////
+// CClientWnd message handlers
+
+BOOL CClientWnd::PreCreateWindow(CREATESTRUCT& cs) 
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (!CWnd::PreCreateWindow(cs))
+		return FALSE;
+
+	cs.style &= ~WS_BORDER;
+	cs.lpszClass = AfxRegisterWndClass(NULL, 
+		::LoadCursor(NULL, IDC_ARROW), HBRUSH(COLOR_BTNFACE+1), NULL);
+
+	return TRUE;	
+}
+
+BOOL CClientWnd::OnEraseBkgnd(CDC* pDC) 
+{
+	CRect rect;
+	GetClientRect(rect);
+	pDC->FillSolidRect(&rect,::GetSysColor(COLOR_BTNFACE));
+	CPen * pPenLight=(CPen*)new CPen;
+	CPen * pPenShadow=(CPen*)new CPen;
+	CPen * pOld;
+	ASSERT(pPenLight&&pPenShadow);
+
+	pPenLight->CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DHILIGHT));
+	pPenShadow->CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DSHADOW));
+	pOld=pDC->SelectObject(pPenShadow);
+	pDC->MoveTo(0,0);
+	pDC->LineTo(rect.right,0);
+	pDC->SelectObject(pPenLight);
+	pDC->MoveTo(0,1);
+	pDC->LineTo(rect.right,1);
+	pDC->SelectObject(pOld);
+	delete pPenShadow;
+	delete pPenLight;
+	return true;	
+}
+
+
+
+int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+	if (!Bar.Create( WS_CHILD|WS_VISIBLE, CRect(0,0,0,0),
+		this, 100 ))
+	{
+		TRACE0("Failed to create COutlookBar...\n");
+		return -1;
+	}
+	Bar.SetOwner (this);
+	Bar.m_ImageList.Create (32, 32, true, 3, 1);
+
+	HICON hIcon;
+		
+	hIcon= AfxGetApp()->LoadIcon (IDI_TRY);
+	Bar.m_ImageList.Add (hIcon);
+	hIcon= AfxGetApp()->LoadIcon (IDI_ACTIVE);
+	Bar.m_ImageList.Add (hIcon);
+	hIcon= AfxGetApp()->LoadIcon (IDI_DEAD);
+	Bar.m_ImageList.Add (hIcon);
+	
+///////////////////
+	int count;
+	char buf[256];
+
+	GetModuleFileName(AfxGetInstanceHandle(),buf,256);
+	CString path(buf);
+	count=path.GetLength();
+	while(count){
+		count--;
+		if(path.GetAt(count)=='\\')
+			break;
+	}
+	m_sPath=path.Left(count+1);
+
+	CFile abf;
+	if(!abf.Open(m_sPath+ABFILE,CFile::modeCreate|CFile::modeNoTruncate|CFile::modeRead))
+		return -1;
+	if(abf.GetLength()){
+		CArchive abar(&abf,CArchive::load);
+		abar>>count;
+		while(count--){
+			CABItem *abi=(CABItem*)new CABItem;
+			if(!abi)
+				return -1;
+			abar>>abi->Name;
+			abar>>abi->IP;
+			abar>>abi->WelMsg;
+			abar>>abi->LvWord;
+			abar>>abi->bWelMsg;
+			abar>>abi->bLvWord;
+			AddrBook.AddTail(abi);
+		}
+	}
+	CFile cfgf;
+	if(!cfgf.Open(m_sPath+CFGFILE,CFile::modeCreate|CFile::modeNoTruncate|CFile::modeRead))
+		return -1;
+	if(cfgf.GetLength()){
+		CArchive cfgar(&cfgf,CArchive::load);
+		cfgar>>Config.bAbsentMsg;
+		cfgar>>Config.bBeep;
+		cfgar>>Config.bBusyMsg;
+		cfgar>>Config.bIPAB;
+		cfgar>>Config.bNeedConfirm;
+		cfgar>>Config.bWelMsg;
+		cfgar>>Config.nMaxConnections;
+		cfgar>>Config.nTimeOut1;
+		cfgar>>Config.nTimeOut2;
+		cfgar>>Config.sAbsentMsg;
+		cfgar>>Config.sBusyMsg;
+		cfgar>>Config.sMyName;
+		cfgar>>Config.sWelMsg;
+		cfgar>>(DWORD)Config.clrEditBack;
+		cfgar>>(DWORD)Config.clrEditText;
+		cfgar.Read(&Config.lfEdit,sizeof(LOGFONT));
+		cfgar>>Config.bHScroll;
+		cfgar>>Config.bVScroll;
+	}
+	
+	if(!Local.Create(
+		WS_TABSTOP|
+		WS_VISIBLE|
+		WS_CHILD|
+		ES_MULTILINE|
+		ES_AUTOHSCROLL|
+		ES_AUTOVSCROLL|
+		ES_READONLY,
+		CRect(0,0,0,0),
+		this,
+		102))
+		return -1;
+	if(!Remote.Create(
+		WS_TABSTOP|
+		WS_CHILD|
+		WS_VISIBLE|
+		ES_MULTILINE|
+		ES_AUTOHSCROLL|
+		ES_AUTOVSCROLL|
+		ES_READONLY,
+		CRect(0,0,0,0),
+		this,
+		103))
+		return -1;
+	
+	if(Config.bHScroll){
+		Local.ModifyStyle(0,WS_HSCROLL);
+		Remote.ModifyStyle(0,WS_HSCROLL);
+	}
+	if(Config.bVScroll){
+		Local.ModifyStyle(0,WS_VSCROLL);
+		Remote.ModifyStyle(0,WS_VSCROLL);
+	}
+	
+	Local.ModifyStyleEx(0,WS_EX_CLIENTEDGE);
+	Remote.ModifyStyleEx(0,WS_EX_CLIENTEDGE);
+	CBrush br(Config.clrEditBack);
+
+
+	Local.m_clrText=Config.clrEditText;
+	Local.m_clrBack=Config.clrEditBack;
+	Local.m_hbrBack=HBRUSH(br);
+
+	Remote.m_clrText=Config.clrEditText;
+	Remote.m_clrBack=Config.clrEditBack;
+	Remote.m_hbrBack=HBRUSH(br);
+	br.Detach();
+
+	if(Config.lfEdit.lfHeight){
+		CFont ft;
+		ft.CreateFontIndirect(&Config.lfEdit);
+		Local.SetFont(&ft);
+		Remote.SetFont(&ft);
+		ft.Detach();
+	}else{
+		Local.SetFont(CFont::FromHandle((HFONT)::GetStockObject(DEFAULT_GUI_FONT)));
+		Remote.SetFont(CFont::FromHandle((HFONT)::GetStockObject(DEFAULT_GUI_FONT)));
+	}
+
+	if(!Status.Create(CCS_NORESIZE|WS_VISIBLE|WS_CHILD|SS_LEFTNOWORDWRAP,CRect(0,0,0,0),this,104))
+		return -1;
+
+	if(!SetTimer(TALKTIMER,100,NULL))
+		return -1;
+
+	m_psockListen = new CListenSock(this);
+	if (!m_psockListen->Create(813)){
+		AfxMessageBox(_T("Server socket create failed, maybe Talk is already running! "));
+		delete m_psockListen;
+		m_psockListen=NULL;
+		return -1;
+	}
+	
+	if (!m_psockListen->Listen())
+		return -1;
+
+	int New;
+	if((New=CheckNew())){
+		CString str;
+		if(New==1)
+			str="a piece of";
+		else
+			str.Format("%d pieces of",New);
+		AfxMessageBox(CString("You have got ")+str+" new message!");
+		PostMessage(WM_COMMAND,ID_LOG);
+	}
+	return 0;
+}
+
+void CClientWnd::OnSize(UINT nType, int cx, int cy) 
+{
+	CWnd ::OnSize(nType, cx, cy);
+	
+	CRect r;
+	GetClientRect(&r);
+	NONCLIENTMETRICS ncm;
+	ncm.cbSize=sizeof(NONCLIENTMETRICS);
+
+	::SystemParametersInfo(SPI_GETNONCLIENTMETRICS,sizeof(NONCLIENTMETRICS),
+		&ncm,0);
+	int m=ncm.iMenuHeight;
+	int l=r.left;
+	int w=r.Width()-82;
+	int t=r.top+4;
+	int b=r.bottom;
+	int h=r.Height();
+	Bar.MoveWindow(l,t,80,b-t);
+
+	l+=82;
+	int lh=(h-7-m)/2;
+	int rh=(h-7-m)-lh;
+	Remote.MoveWindow(l,t,w,rh);
+	Local.MoveWindow(l,t+=2+rh,w,lh);
+	Status.MoveWindow(l,t+=lh+1,w,m);
+}
+
+void CClientWnd::OnAccept(int nErrorCode)
+{
+	if(nErrorCode==WSAENETDOWN)
+		return;
+	
+	CTalkSock * pSock = (CTalkSock*)new CTalkSock(this,true);
+	if(!pSock)
+		return;
+		
+	if(!m_psockListen->Accept(*pSock)){
+		delete pSock;			
+		return;
+	}
+
+
+	int i=0;
+	POSITION pos=TSL.GetHeadPosition();
+	while(pos){
+		CTalkSock * pSock=(CTalkSock*)TSL.GetNext(pos);
+		ASSERT(pSock);
+		if(pSock->m_nStatus!=S_CLOSED)
+			i++;
+	}
+
+	if(i>Config.nMaxConnections)
+		delete pSock;
+	else
+		pSock->Connected();
+}
+
+void CClientWnd::OnInput(CString &str,int nType)
+{
+	if(Local.GetStyle()&ES_READONLY){
+		MessageBeep(-1);
+		return;
+	}	
+	CTalkSock * pSock=GetCurSock();
+	if(!pSock)
+		return;
+
+	if(str.GetLength()==0)
+		return;
+	if(nType!=0){
+		BOOL found=false;
+
+		CString emote(str);
+		emote.TrimLeft();
+		emote.TrimRight();
+		if(emote.GetLength()==0)
+			return;
+		CEmoteItem * ei;
+		POSITION pos=EmoteList.GetHeadPosition();
+		while(pos){
+			ei=(CEmoteItem*)EmoteList.GetNext(pos);
+			if(!emote.Compare(ei->Emote)){
+				found=true;
+				break;
+			}
+		}
+		if(!found){
+			FILE * fp=fopen(m_sPath+"emote.txt","rb");
+			CString line;	
+			if(fp){
+				while(getline(line,fp)){
+					if(!line.GetLength())
+						continue;
+
+					line.TrimRight();
+					if(line.Compare(CString("-")+emote))
+						continue;
+					found=true;
+					break;
+				}
+				if(found){
+					ei=(CEmoteItem*)new CEmoteItem;
+
+					EmoteList.AddTail(ei);
+					ei->Emote=emote;
+					while(getline(line,fp)){
+						if(!line.GetLength())
+							continue;
+						if(line[0]=='-')
+							break;
+						if(line.GetLength()<=2)
+							continue;
+						if(line[0]=='1'&&line[1]==':'){
+							line.Delete(0,2);
+							ei->ToNone=line;
+						}
+						if(line[0]=='2'&&line[1]==':'){
+							line.Delete(0,2);
+							ei->ToHe=line;
+						}
+						if(line[0]=='3'&&line[1]==':'){
+							line.Delete(0,2);
+							ei->ToMe=line;
+						}
+					}
+				}
+				fclose(fp);
+			}
+		}
+		if(found){
+			switch(nType){
+			case 1:
+				str=ei->ToNone;
+				break;
+			case 2:
+				str=ei->ToHe;
+				break;
+			case 3:
+				str=ei->ToMe;
+				break;
+			default:
+				ASSERT(false);
+				break;
+			}
+			str=CString("¡¾ÏÐÁÄ¡¿")+str;
+			str.Replace("%ME%",Config.sMyName);
+			str.Replace("%HE%",pSock->m_sNickName);
+			Local.ReplaceSel(str+"\r\n");
+		}
+	}else
+		Local.ReplaceSel(str);		
+}
+
+
+
+void CClientWnd::OnAddrbook() 
+{
+	CABDlg ab;
+	int ret;
+	ab.AB=&AddrBook;
+	ret=ab.DoModal();
+	if(ret==ID_CONNECT){
+		Connect(ab.IP,ab.name);
+		return;
+	}
+}
+
+void CClientWnd::OnConnect() 
+{
+	CCDlg cd;
+	cd.strIP=Config.m_sIP;
+	if(cd.DoModal()==IDOK){
+		Config.m_sIP=cd.strIP;
+		Connect(cd.strIP,"Unknown");
+	}
+}
+
+void CClientWnd::Connect(CString &IP,CString Name)
+{
+	if(!m_bWantTalk){
+		m_bWantTalk=true;
+		((CMainFrame*)AfxGetMainWnd())->SetTrayIcon(IDI_ICON4);
+	}
+	
+	int i=0;
+	POSITION pos=TSL.GetHeadPosition();
+	while(pos){
+		CTalkSock * pSock=(CTalkSock*)TSL.GetNext(pos);
+		ASSERT(pSock);
+		if(pSock->m_nStatus!=S_CLOSED)
+			i++;
+	}
+	if(i>=Config.nMaxConnections){
+		AfxMessageBox("Too many connections!");
+		return;
+	}
+
+	CTalkSock * pSock = (CTalkSock*)new CTalkSock(this,false);
+	if(!pSock)
+		return;
+	
+	if(!pSock->Create()||!pSock->Connect(Name,IP)){
+		delete pSock;
+		AfxMessageBox(CString("Failed in connection to ")+Name+" on "+IP);
+	}else{
+		AddBarItem(Name,0,(DWORD)pSock->m_posTSL);
+		UpdateView();
+	}
+}
+
+void CClientWnd::OnLog() 
+{
+	CLogDlg ld;
+	ld.AB=&AddrBook;
+	ld.m_sLogFile=m_sPath+LOGFILE;
+	switch(ld.DoModal()){
+	case ID_RECONN:
+		Connect(ld.IP,ld.name);
+		break;
+	case IDCANCEL:
+		break;
+	default:
+		break;
+	}
+}
+
+void CClientWnd::OnUpdateBeep(CCmdUI* pCmdUI) 
+{
+	CTalkSock * pSock=GetCurSock();
+	if(pSock&&pSock->m_nStatus==S_TALKING)
+		pCmdUI->Enable(true);
+	else
+		pCmdUI->Enable(false);
+}
+
+void CClientWnd::OnBeep() 
+{
+	CTalkSock * pSock=GetCurSock();
+	if(pSock&&pSock->m_nStatus==S_TALKING)
+		pSock->Beep();
+}
+
+void CClientWnd::OnDisc() 
+{
+	CTalkSock* pSock=GetCurSock();
+	if(!pSock)
+		return;
+	if(pSock->m_nStatus==S_TALKING)
+		pSock->ShutDown();
+	else
+		DeleteBarItem(Bar.GetCurSel());
+}
+
+void CClientWnd::OnUpdateDisc(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(Bar.GetCurSel()!=LB_ERR);
+}
+
+
+void CClientWnd::OnUpdateWanttalk(CCmdUI* pCmdUI) 
+{
+	pCmdUI->SetCheck(m_bWantTalk?1:0);
+	
+}
+
+void CClientWnd::OnWanttalk() 
+{
+	m_bWantTalk=!m_bWantTalk;
+	((CMainFrame*)AfxGetMainWnd())->SetTrayIcon(m_bWantTalk?IDI_ICON4:IDI_ICON1);
+	if(m_bWantTalk){
+		int New;
+		if((New=CheckNew())){
+			CString str;
+			if(New==1)
+				str="a piece of";
+			else
+				str.Format("%d pieces of",New);
+			AfxMessageBox(CString("You have got ")+str+" new message!");
+			PostMessage(WM_COMMAND,ID_LOG);
+		}
+	}
+}
+
+void CClientWnd::OnTimer(UINT nIDEvent) 
+{
+	if(AfxGetMainWnd()->IsWindowVisible()){
+		CTalkSock * pSock=GetCurSock();
+		if(pSock)
+			Status.SetWindowText(pSock->m_sStatusString);
+		else
+			Status.SetWindowText("No connections.");
+	}
+	POSITION pos=TSL.GetHeadPosition();
+	while(pos){
+		CTalkSock * pSock=(CTalkSock*)TSL.GetNext(pos);
+		if(pSock->m_nStatus==S_CONNECTED){
+			if((--pSock->m_lTimer)<=0)
+				pSock->ShutDown();
+		}
+		if(pSock->m_nStatus==S_TALKING){
+			if((++pSock->m_lTimer)>=Config.nTimeOut1*10)
+				pSock->ShutDown();
+		}
+	}
+}
+
+BOOL CClientWnd::WantClose()
+{
+	if(MessageBox("Do you really want to exit?","Talk",MB_ICONQUESTION|MB_OKCANCEL)==IDOK){
+		POSITION pos=TSL.GetHeadPosition();
+		while(pos){
+			CTalkSock * pSock=(CTalkSock*)TSL.GetNext(pos);
+			if(pSock)
+				delete pSock;
+		}
+		TSL.RemoveAll();
+		return true;
+	}
+	return false;
+}
+
+
+void CClientWnd::OnSetting() 
+{
+	CMsgPageW pw;
+	CMsgPageA pa;
+	CMsgPageB pb;
+	CCfgGen cg;
+	CCfgPersonal cp;
+
+	CPropertySheet sheet("Talk Setting",this);
+
+	pw.m_enable	=Config.bWelMsg	;
+	pw.m_msg	=Config.sWelMsg	;
+	pa.m_enable	=Config.bAbsentMsg;
+	pa.m_msg	=Config.sAbsentMsg;
+	pb.m_enable	=Config.bBusyMsg;	
+	pb.m_msg	=Config.sBusyMsg;	
+
+	cg.m_beep		=Config.bBeep		;
+	cg.m_max		=Config.nMaxConnections;
+	cg.m_name		=Config.sMyName		;
+	cg.m_need		=Config.bNeedConfirm	;
+	cg.m_only		=Config.bIPAB		;
+	cg.m_time1		=Config.nTimeOut1	;
+	cg.m_time2		=Config.nTimeOut2	;
+
+	HKEY hKey=NULL;
+	char * ValueName="AndyTalk";
+	DWORD type=REG_SZ;
+	BYTE path[256];
+	DWORD size=256;
+	if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+		_T("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
+		0, KEY_WRITE|KEY_READ,
+		&hKey)!=ERROR_SUCCESS){
+		AfxMessageBox("Error to open REGISTRY!");
+		return;
+	}else{
+		if(RegQueryValueEx(hKey,
+			ValueName,
+			NULL,
+			&type,
+			path,
+			&size)==ERROR_SUCCESS)
+			cg.m_startup=true;
+		else
+			cg.m_startup=false;
+	}
+	
+
+	cp.AB=&AddrBook;
+	sheet.AddPage(&cg);
+	sheet.AddPage(&pw);
+	sheet.AddPage(&pb);
+	sheet.AddPage(&pa);
+	sheet.AddPage(&cp);
+
+	if(sheet.DoModal()!=IDOK)
+		return;
+	Config.bWelMsg=pw.m_enable;
+	Config.sWelMsg=pw.m_msg;
+	Config.bAbsentMsg=pa.m_enable;
+	Config.sAbsentMsg=pa.m_msg;
+	Config.bBusyMsg=pb.m_enable;
+	Config.sBusyMsg=pb.m_msg;
+	Config.bBeep			=cg.m_beep	;
+	Config.nMaxConnections	=cg.m_max	;
+	Config.sMyName			=cg.m_name	;
+	Config.bNeedConfirm		=cg.m_need	;
+	Config.bIPAB			=cg.m_only	;
+	Config.nTimeOut1		=cg.m_time1	;
+	Config.nTimeOut2		=cg.m_time2	;
+	if(!cg.m_startup){
+		RegDeleteValue(hKey,ValueName);
+	}else{
+		GetModuleFileName(AfxGetInstanceHandle(),(char *)path,256);
+		RegSetValueEx(hKey,
+			ValueName,
+			0,
+			REG_SZ,
+			path,
+			strlen((char*)path));
+	}
+	RegCloseKey(hKey);
+	
+}
+
+void CClientWnd::OnLocalChange()
+{
+	CTalkSock * pSock=GetCurSock();
+	if(!pSock)
+		return;
+	Local.GetWindowText(pSock->m_sLocal);
+	pSock->SendLocal();
+}
+
+void CClientWnd::OnFont() 
+{
+	CFontDialog fd;
+	CFont ft,*pft;
+	LOGFONT lf;
+	pft=Local.GetFont();
+	if(pft){
+		pft->GetLogFont(&lf);
+		fd.m_cf.lpLogFont=&lf;
+		fd.m_cf.Flags|=CF_INITTOLOGFONTSTRUCT;
+	}
+	fd.m_cf.rgbColors=(DWORD)Local.m_clrText;
+	if(fd.DoModal()==IDOK){
+		Local.m_clrText=fd.GetColor();
+		Remote.m_clrText=fd.GetColor();	
+		Config.clrEditText=fd.GetColor();
+
+		fd.GetCurrentFont(&lf);
+		Config.lfEdit=lf;
+		ft.CreateFontIndirect(&lf);
+		Local.SetFont(&ft);
+		Remote.SetFont(&ft);
+		ft.Detach();
+		
+	}
+
+}
+void CClientWnd::OnBackcolor() 
+{
+	CColorDialog cd;
+	if(cd.DoModal()==IDOK){
+		Config.clrEditBack=cd.GetColor();
+		DeleteObject(Local.m_hbrBack);
+		CBrush br(cd.GetColor());
+		Local.m_clrBack=cd.GetColor();
+		Remote.m_clrBack=cd.GetColor();
+		Local.m_hbrBack=(HBRUSH)br;
+		Remote.m_hbrBack=(HBRUSH)br;
+		br.Detach();
+		Local.Invalidate();
+		Remote.Invalidate();
+	}
+}
+
+void CClientWnd::OnHscroll() 
+{
+	if(Local.GetStyle()&WS_HSCROLL){
+		Local.ModifyStyle(WS_HSCROLL,0	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Remote.ModifyStyle(WS_HSCROLL,0	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Config.bHScroll=false;
+	}else{
+		Local.ModifyStyle(0,WS_HSCROLL	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Remote.ModifyStyle(0,WS_HSCROLL	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Config.bHScroll=true;
+	}	
+}
+
+void CClientWnd::OnVscroll() 
+{
+	if(Local.GetStyle()&WS_VSCROLL){
+		Local.ModifyStyle(WS_VSCROLL,0	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Remote.ModifyStyle(WS_VSCROLL,0	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Config.bVScroll=false;
+	}else{
+		Local.ModifyStyle(0,WS_VSCROLL	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Remote.ModifyStyle(0,WS_VSCROLL	
+			,SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		Config.bVScroll=true;
+	}
+}
+
+void CClientWnd::OnUpdateVscroll(CCmdUI* pCmdUI) 
+{
+	pCmdUI->SetCheck(Local.GetStyle()&WS_VSCROLL);	
+	
+}
+
+void CClientWnd::OnUpdateHscroll(CCmdUI* pCmdUI) 
+{
+	pCmdUI->SetCheck(Local.GetStyle()&WS_HSCROLL);	
+}
+
+void CClientWnd::OnSave() 
+{
+	POSITION pos;
+	CFile abf;
+	if(abf.Open(m_sPath+ABFILE,CFile::modeCreate|CFile::modeReadWrite)){
+		CArchive abar(&abf,CArchive::store);
+		abar<<AddrBook.GetCount();
+		
+		pos=AddrBook.GetHeadPosition();
+		while(pos){
+			CABItem* pItem=(CABItem*)AddrBook.GetNext(pos);
+			abar<<pItem->Name;
+			abar<<pItem->IP;
+			abar<<pItem->WelMsg;
+			abar<<pItem->LvWord;
+			abar<<pItem->bWelMsg;
+			abar<<pItem->bLvWord;
+		}
+	}
+	CFile cfgf;
+	if(cfgf.Open(m_sPath+CFGFILE,CFile::modeCreate|CFile::modeReadWrite)){
+		CArchive cfgar(&cfgf,CArchive::store);
+		cfgar<<Config.bAbsentMsg;
+		cfgar<<Config.bBeep;
+		cfgar<<Config.bBusyMsg;
+		cfgar<<Config.bIPAB;
+		cfgar<<Config.bNeedConfirm;
+		cfgar<<Config.bWelMsg;
+		cfgar<<Config.nMaxConnections;
+		cfgar<<Config.nTimeOut1;
+		cfgar<<Config.nTimeOut2;
+		cfgar<<Config.sAbsentMsg;
+		cfgar<<Config.sBusyMsg;
+		cfgar<<Config.sMyName;
+		cfgar<<Config.sWelMsg;
+		cfgar<<(DWORD)Config.clrEditBack;
+		cfgar<<(DWORD)Config.clrEditText;
+		cfgar.Write(&Config.lfEdit,sizeof(LOGFONT));
+		cfgar<<Config.bHScroll;
+		cfgar<<Config.bVScroll;
+	}
+}
+
+void CClientWnd::OnEditCopy() 
+{
+	CWnd * pWnd=GetFocus();
+	if(!pWnd)
+		return;
+	if(pWnd->IsKindOf(RUNTIME_CLASS(CEdit)))
+		((CEdit*)pWnd)->Copy();	
+}
+
+void CClientWnd::OnUpdateEditCopy(CCmdUI* pCmdUI) 
+{
+	CWnd * pWnd=GetFocus();
+	if(!pWnd){
+		pCmdUI->Enable(false);
+		return;
+	}
+	if(pWnd->IsKindOf(RUNTIME_CLASS(CEdit))){
+		int start,end;
+		((CEdit*)pWnd)->GetSel(start,end);
+		if(start==end)
+			pCmdUI->Enable(false);
+		else
+			pCmdUI->Enable(true);
+	}else
+			pCmdUI->Enable(false);
+}
+
+void CClientWnd::OnEditCut() 
+{
+	CWnd * pWnd=GetFocus();
+	if(!pWnd)
+		return;
+	if(pWnd->IsKindOf(RUNTIME_CLASS(CEdit)))
+		((CEdit*)pWnd)->Cut();	
+}
+
+void CClientWnd::OnUpdateEditCut(CCmdUI* pCmdUI) 
+{
+	CWnd * pWnd=GetFocus();
+	if(!pWnd){
+		pCmdUI->Enable(false);
+		return;
+	}
+	BOOL ret;
+	if(pWnd->IsKindOf(RUNTIME_CLASS(CEdit))){
+		if(((CEdit*)pWnd)->GetStyle()&ES_READONLY){
+			ret=false;
+		}else{
+			int start,end;
+			((CEdit*)pWnd)->GetSel(start,end);
+			if(start==end)
+				ret=false;
+			else
+				ret=true;
+		}
+	}else
+			ret=false;
+	pCmdUI->Enable(ret);
+	
+}
+
+void CClientWnd::OnEditPaste() 
+{
+	CWnd * pWnd=GetFocus();
+	if(!pWnd)
+		return;
+	if(pWnd->IsKindOf(RUNTIME_CLASS(CEdit)))
+		((CEdit*)pWnd)->Paste();	
+}
+
+void CClientWnd::OnUpdateEditPaste(CCmdUI* pCmdUI) 
+{
+	CWnd * pWnd=GetFocus();
+	if(!pWnd){
+		pCmdUI->Enable(false);
+		return;
+	}
+	BOOL ret;
+	if(pWnd->IsKindOf(RUNTIME_CLASS(CEdit))){
+		if(((CEdit*)pWnd)->GetStyle()&ES_READONLY){
+			ret=false;
+		}else{
+			if(!OpenClipboard())
+				ret=false;
+			else{
+				ret=(int)GetClipboardData(CF_TEXT);
+				CloseClipboard();
+			}
+		}
+	}else
+			ret=false;
+	pCmdUI->Enable(ret);
+	
+
+}
+
+BOOL CClientWnd::OnCommand(WPARAM wParam, LPARAM lParam) 
+{
+	if(HIWORD(wParam)==LBN_SELCHANGE){
+		UpdateView();
+		return true;
+	}
+	return CWnd::OnCommand(wParam, lParam);
+}
+
+void CClientWnd::UpdateView()
+{
+	POSITION pos;
+	int i;
+	CTalkSock * pSock;
+	
+	pos=TSL.GetHeadPosition();
+	while(pos){
+		pSock=(CTalkSock*)TSL.GetNext(pos);
+		pSock->m_bVisible=false;
+	}
+
+	i=Bar.GetCurSel();
+	if(i>=0){
+		pos=(POSITION)Bar.GetItemData(i);
+		pSock=(CTalkSock*)TSL.GetAt(pos);
+		pSock->m_bVisible=true;
+		Remote.SetWindowText(pSock->m_sRemote);
+		Remote.SetSel(pSock->m_wRemotePos,pSock->m_wRemotePos);
+		Local.SetWindowText(pSock->m_sLocal);
+		Local.SetSel(pSock->m_wLocalPos,pSock->m_wLocalPos);
+		if(pSock->m_nStatus!=S_TALKING)
+			Local.SetReadOnly(true);
+		else
+			Local.SetReadOnly(false);
+	}else{
+		Remote.SetWindowText(NULL);
+		Local.SetWindowText(NULL);
+		Local.SetReadOnly(true);
+	}
+}
+
+CTalkSock * CClientWnd::GetCurSock()
+{
+	int i=Bar.GetCurSel();
+	if(i==LB_ERR)
+		return NULL;
+	POSITION pos=(POSITION)Bar.GetItemData(i);
+	return 	(CTalkSock*)TSL.GetAt(pos);
+}
+
+int CClientWnd::AddBarItem(CString str, int nImage,DWORD dwData)
+{
+	int count=Bar.GetCount();
+	CTalkSock * pSock;
+
+	POSITION pos;
+	int i=count;
+	if(count>=30)
+		for(i=0;i<count;i++){
+			pos=(POSITION)Bar.GetItemData(i);
+			pSock=(CTalkSock*)TSL.GetAt(pos);
+			ASSERT(pSock);
+			if(pSock->m_nStatus==S_CLOSED){
+				DeleteBarItem(i);
+				break;
+			}
+		}
+	Bar.InsertString(i,str,nImage);
+	Bar.SetItemData(i,dwData);
+	pSock=(CTalkSock*)TSL.GetAt((POSITION)dwData);
+	ASSERT(pSock);
+	if(!pSock->m_bCallIn||!GetCurSock()||GetCurSock()->m_nStatus!=S_TALKING)
+		Bar.SetCurSel(i);
+
+	UpdateView();
+	Bar.Invalidate();
+	return i;
+}
+
+void CClientWnd::DeleteBarItem(int nIndex)
+{
+	BOOL tmp=false;
+	CTalkSock * pSock=GetSock(nIndex);
+	if(pSock)
+		delete pSock;
+
+	if(Bar.GetCurSel()==LB_ERR||Bar.GetCurSel()==nIndex)
+		tmp=true;
+	Bar.DeleteListString(nIndex);
+	if(tmp)
+		if(nIndex<Bar.GetCount())
+			Bar.SetCurSel(nIndex);
+		else
+			Bar.SetCurSel(Bar.GetCount()-1);
+	UpdateView();
+}
+
+CTalkSock * CClientWnd::GetSock(int nIndex)
+{
+	if(Bar.GetItemData(nIndex)==LB_ERR)
+		return NULL;
+
+	POSITION pos=(POSITION)Bar.GetItemData(nIndex);
+	return 	(CTalkSock*)TSL.GetAt(pos);
+}
+
+void CClientWnd::OnSetFocus(CWnd* pOldWnd) 
+{
+	CWnd::OnSetFocus(pOldWnd);
+
+	GetDlgItem(102)->SetFocus();
+
+}
+
+BOOL CClientWnd::DestroyWindow() 
+{
+	POSITION pos=EmoteList.GetHeadPosition();
+	while(pos){
+		CEmoteItem * ei=(CEmoteItem*)EmoteList.GetNext(pos);
+		if(ei)
+			delete ei;
+	}
+	EmoteList.RemoveAll();
+
+	CFile abf;
+	if(abf.Open(m_sPath+ABFILE,CFile::modeCreate|CFile::modeReadWrite)){
+		CArchive abar(&abf,CArchive::store);
+		abar<<AddrBook.GetCount();
+		
+		pos=AddrBook.GetHeadPosition();
+		while(pos){
+			CABItem* pItem=(CABItem*)AddrBook.GetNext(pos);
+			abar<<pItem->Name;
+			abar<<pItem->IP;
+			abar<<pItem->WelMsg;
+			abar<<pItem->LvWord;
+			abar<<pItem->bWelMsg;
+			abar<<pItem->bLvWord;
+			delete pItem;
+		}
+	}
+	AddrBook.RemoveAll();
+
+
+
+	CFile cfgf;
+	if(cfgf.Open(m_sPath+CFGFILE,CFile::modeCreate|CFile::modeReadWrite)){
+		CArchive cfgar(&cfgf,CArchive::store);
+		cfgar<<Config.bAbsentMsg;
+		cfgar<<Config.bBeep;
+		cfgar<<Config.bBusyMsg;
+		cfgar<<Config.bIPAB;
+		cfgar<<Config.bNeedConfirm;
+		cfgar<<Config.bWelMsg;
+		cfgar<<Config.nMaxConnections;
+		cfgar<<Config.nTimeOut1;
+		cfgar<<Config.nTimeOut2;
+		cfgar<<Config.sAbsentMsg;
+		cfgar<<Config.sBusyMsg;
+		cfgar<<Config.sMyName;
+		cfgar<<Config.sWelMsg;
+		cfgar<<(DWORD)Config.clrEditBack;
+		cfgar<<(DWORD)Config.clrEditText;
+		cfgar.Write(&Config.lfEdit,sizeof(LOGFONT));
+		cfgar<<Config.bHScroll;
+		cfgar<<Config.bVScroll;
+	}	
+	return CWnd::DestroyWindow();
+}
+
+void CClientWnd::ConnectOK(CTalkSock *pSock)
+{
+	if(m_bWantTalk)
+		Sound(1);
+
+	CString wm,am,bm;
+	if(Config.bWelMsg)
+		wm=Config.sWelMsg;
+	if(Config.bAbsentMsg)
+		am=Config.sAbsentMsg;
+	if(Config.bBusyMsg)
+		bm=Config.sBusyMsg;
+
+	POSITION pos=AddrBook.GetHeadPosition();
+	while(pos){
+		CABItem * abi=(CABItem*)AddrBook.GetNext(pos);
+		if(!pSock->m_sIP.Compare(abi->IP)){
+			if(abi->bWelMsg)
+				wm=abi->WelMsg;
+			if(abi->bLvWord)
+				am=abi->LvWord;
+			break;
+		}
+	}
+
+	if(wm.GetLength()){
+		wm.Replace("%name%",pSock->m_sNickName);
+		pSock->m_sLocal+=wm;	
+		pSock->SendLocal();
+		UpdateView();
+	}
+	if(am.GetLength()&&!pSock->m_bWantTalk){
+		pSock->m_sLocal+=am;	
+		pSock->SendLocal();
+		UpdateView();
+	}
+	if(bm.GetLength())
+		if(pSock->m_bWantTalk
+			&&GetCurSock()
+			&&GetCurSock()!=pSock
+			&&GetCurSock()->m_nStatus==S_TALKING){
+			pSock->m_sLocal+=bm;	
+			pSock->SendLocal();
+			UpdateView();
+		}
+}
+
+void CClientWnd::Sound(int nType)
+{
+	MessageBeep(-1);
+	if(nType==1)
+		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
+	if(nType==0)
+		::PlaySound((const char *)IDR_LOGOUT,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
+}
+
+POSITION CClientWnd::LoadEmote(CString sName)
+{
+	return NULL;
+}
+
+BOOL CClientWnd::getline(CString &str,FILE * fp)
+{
+	CString buffer;
+	char * buf=buffer.GetBuffer(1024);
+	int i=0;
+
+	LONG pos=ftell(fp);
+	if(fread(buf,1,1024,fp)==0)
+		return false;
+
+	buffer.ReleaseBuffer();
+	if(buffer.IsEmpty())
+		return false;
+
+	for(i=0;i<1023;i++)
+		if(buffer[i]=='\r'||buffer[i]=='\n'){
+			str=buffer.Left(i);
+			if(buffer[i]=='\r'||buffer[i+1]=='\n')
+				fseek(fp,i+2+pos,SEEK_SET);
+			else
+				fseek(fp,i+1+pos,SEEK_SET);
+			break;
+		}
+	if(i==1023)
+		return false;
+
+	buffer=str;
+	if((i=buffer.Find("//",0))!=-1)
+		str=buffer.Left(i);
+	return true;
+}
+
+int CClientWnd::CheckNew()
+{
+	int count;
+	int ret=0;
+	CFile logf;
+	if(!logf.Open(m_sPath+LOGFILE,
+		CFile::modeCreate|
+		CFile::modeNoTruncate|
+		CFile::modeRead)){
+	}else{
+		if(logf.GetLength()){
+			CLogItem *li=(CLogItem*)new CLogItem;
+			CArchive logar(&logf,CArchive::load);
+			logar>>count;
+			while(count--){
+				logar>>li->bNew;
+				if(li->bNew)
+					ret++;
+				logar>>li->bOut;
+				logar>>li->sIP;
+				logar>>li->sLocal>>li->sRemote;
+				logar>>li->sTalkName;
+				logar>>li->tBeginTime;
+				logar>>li->tEndTime;
+			}
+			delete li;
+		}
+	}
+	return ret;
+}

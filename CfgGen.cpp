@@ -1,0 +1,73 @@
+// CfgGen.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "talk.h"
+#include "CfgGen.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// CCfgGen property page
+
+IMPLEMENT_DYNCREATE(CCfgGen, CPropertyPage)
+
+CCfgGen::CCfgGen() : CPropertyPage(CCfgGen::IDD)
+{
+	//{{AFX_DATA_INIT(CCfgGen)
+	m_beep = FALSE;
+	m_name = _T("");
+	m_need = FALSE;
+	m_only = FALSE;
+	m_sb1 = 0;
+	m_sb2 = 0;
+	m_time2 = 0;
+	m_time1 = 0;
+	m_max = 0;
+	m_startup = FALSE;
+	//}}AFX_DATA_INIT
+}
+
+CCfgGen::~CCfgGen()
+{
+}
+
+void CCfgGen::DoDataExchange(CDataExchange* pDX)
+{
+	CPropertyPage::DoDataExchange(pDX);
+	//{{AFX_DATA_MAP(CCfgGen)
+	DDX_Check(pDX, IDC_BEEP, m_beep);
+	DDX_Text(pDX, IDC_MYNAME, m_name);
+	DDV_MaxChars(pDX, m_name, 16);
+	DDX_Check(pDX, IDC_NEED, m_need);
+	DDX_Check(pDX, IDC_ONLY, m_only);
+	DDX_Text(pDX, IDC_TIME2, m_time2);
+	DDV_MinMaxInt(pDX, m_time2, 1, 60);
+	DDX_Text(pDX, IDC_TIME1, m_time1);
+	DDV_MinMaxInt(pDX, m_time1, 1, 3600);
+	DDX_Text(pDX, IDC_MAXCONN, m_max);
+	DDV_MinMaxInt(pDX, m_max, 1, 20);
+	DDX_Check(pDX, IDC_STARTUP, m_startup);
+	//}}AFX_DATA_MAP
+}
+
+
+BEGIN_MESSAGE_MAP(CCfgGen, CPropertyPage)
+	//{{AFX_MSG_MAP(CCfgGen)
+	ON_BN_CLICKED(IDC_NEED, OnNeed)
+	//}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+
+/////////////////////////////////////////////////////////////////////////////
+// CCfgGen message handlers
+
+void CCfgGen::OnNeed() 
+{
+		
+}
+
+

@@ -1,0 +1,649 @@
+// ClientWnd.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "talk.h"
+#include "ClientWnd.h"
+#include "TalkSock.h"
+#include "ABItem.h"
+#include "ABDlg.h"
+#include "CDlg.h"
+#include "LogDlg.h"
+#include "LogItem.h"
+
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// CClientWnd
+
+
+#define ABFILE "AddressBook.dat"
+#define LOGFILE "Log.dat"
+#define CFGFILE "Config.dat"
+
+
+CClientWnd::CClientWnd()
+{
+	
+	m_psockListen=NULL;
+	m_psockTalk=NULL;
+	m_bTalking=false;
+	m_bWantTalk=true;
+	WelMsg="Welcome!";
+	MyName="Andy";
+}
+
+CClientWnd::~CClientWnd()
+{
+	if(m_psockListen)
+		delete m_psockListen;
+}
+
+
+
+BEGIN_MESSAGE_MAP(CClientWnd, CWnd)
+	//{{AFX_MSG_MAP(CClientWnd)
+	ON_WM_ERASEBKGND()
+	ON_WM_CREATE()
+	ON_WM_SIZE()
+	ON_COMMAND(ID_ADDRBOOK, OnAddrbook)
+	ON_COMMAND(ID_CONNECT, OnConnect)
+	ON_COMMAND(ID_LOG, OnLog)
+	ON_UPDATE_COMMAND_UI(ID_LOG, OnUpdateLog)
+	ON_UPDATE_COMMAND_UI(ID_BEEP, OnUpdateBeep)
+	ON_COMMAND(ID_BEEP, OnBeep)
+	ON_COMMAND(ID_DISC, OnDisc)
+	ON_UPDATE_COMMAND_UI(ID_DISC, OnUpdateDisc)
+	ON_WM_CLOSE()
+	ON_UPDATE_COMMAND_UI(ID_COPY, OnUpdateCopy)
+	ON_COMMAND(ID_COPY, OnCopy)
+	ON_COMMAND(ID_CUT, OnCut)
+	ON_UPDATE_COMMAND_UI(ID_CUT, OnUpdateCut)
+	ON_COMMAND(ID_PASTE, OnPaste)
+	ON_UPDATE_COMMAND_UI(ID_PASTE, OnUpdatePaste)
+	//}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+
+
+/////////////////////////////////////////////////////////////////////////////
+// CClientWnd message handlers
+
+BOOL CClientWnd::PreCreateWindow(CREATESTRUCT& cs) 
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (!CWnd::PreCreateWindow(cs))
+		return FALSE;
+
+	cs.style &= ~WS_BORDER;
+	cs.lpszClass = AfxRegisterWndClass(NULL, 
+		::LoadCursor(NULL, IDC_ARROW), HBRUSH(COLOR_BTNFACE+1), NULL);
+
+	return TRUE;	
+}
+
+BOOL CClientWnd::OnEraseBkgnd(CDC* pDC) 
+{
+	CRect rect;
+	GetClientRect(rect);
+	pDC->FillSolidRect(&rect,::GetSysColor(COLOR_BTNFACE));
+	CPen * pPenLight=(CPen*)new CPen;
+	CPen * pPenShadow=(CPen*)new CPen;
+	CPen * pOld;
+	ASSERT(pPenLight&&pPenShadow);
+
+	pPenLight->CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DHILIGHT));
+	pPenShadow->CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DSHADOW));
+	pOld=pDC->SelectObject(pPenShadow);
+	pDC->MoveTo(0,0);
+	pDC->LineTo(rect.right,0);
+	pDC->MoveTo(0,0);
+	pDC->LineTo(0,rect.bottom);
+	pDC->SelectObject(pPenLight);
+	pDC->MoveTo(0,1);
+	pDC->LineTo(rect.right,1);
+	pDC->MoveTo(1,1);
+	pDC->LineTo(1,rect.bottom);
+	pDC->SelectObject(pOld);
+	delete pPenLight;
+	delete pPenShadow;
+	return true;	
+}
+
+
+
+int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	if(!Input.Create(WS_TABSTOP|WS_VISIBLE|WS_GROUP|WS_CHILD|CBS_DROPDOWN|CBS_AUTOHSCROLL|WS_VSCROLL,
+		CRect(0,0,0,0),
+		this,
+		101))
+		return -1;
+
+	if(!Local.Create(
+		WS_TABSTOP|WS_VISIBLE|WS_CHILD|ES_MULTILINE|ES_AUTOHSCROLL|WS_VSCROLL|ES_READONLY,CRect(0,0,0,0),this,102))
+		return -1;
+	if(!Remote.Create(
+		WS_TABSTOP|WS_CHILD|WS_VISIBLE|ES_MULTILINE|ES_AUTOHSCROLL|WS_VSCROLL|ES_READONLY,CRect(0,0,0,0),this,103))
+		return -1;
+	if(!HLocal.Create("Local:",WS_VISIBLE|WS_CHILD,CRect(0,0,0,0),this,104))
+		return -1;
+	if(!HRemote.Create("Remote:",WS_VISIBLE|WS_CHILD,CRect(0,0,0,0),this,105))
+		return -1;
+
+	Local.ModifyStyleEx(0,WS_EX_CLIENTEDGE);
+	Remote.ModifyStyleEx(0,WS_EX_CLIENTEDGE);
+	HLocal.ModifyStyleEx(0,WS_EX_STATICEDGE);
+	HRemote.ModifyStyleEx(0,WS_EX_STATICEDGE);
+
+
+
+	m_psockListen = new CListenSock(this);
+	if (!m_psockListen->Create(813)){
+		AfxMessageBox(_T("Server socket create failed, maybe Talk is already running! "));
+		delete m_psockListen;
+		m_psockListen=NULL;
+		return -1;
+	}
+	
+	if (!m_psockListen->Listen())
+		return -1;
+
+	int count;
+
+	CFile abf;
+	if(!abf.Open(ABFILE,CFile::modeCreate|CFile::modeNoTruncate|CFile::modeRead))
+		return -1;
+	if(abf.GetLength()){
+		CArchive abar(&abf,CArchive::load);
+		abar>>count;
+		while(count--){
+			CABItem *abi=(CABItem*)new CABItem;
+			if(!abi)
+				return -1;
+			abar>>abi->Name;
+			abar>>abi->IP;
+			abar>>abi->WelMsg;
+			abar>>abi->LvWord;
+			abar>>abi->bWelMsg;
+			abar>>abi->bLvWord;
+			AddrBook.AddTail(abi);
+		}
+	}
+
+	CFile logf;
+	if(!logf.Open(LOGFILE,CFile::modeCreate|CFile::modeNoTruncate|CFile::modeRead))
+		return -1;
+	if(logf.GetLength()){
+		CArchive logar(&logf,CArchive::load);
+		logar>>count;
+		while(count--){
+			CLogItem *li=(CLogItem*)new CLogItem;
+			if(!li)
+				return -1;
+			logar>>li->bOut;
+			logar>>li->m_nLPos>>li->m_nRPos;
+			logar>>li->sIP;
+			logar>>li->sLocal>>li->sRemote;
+			logar>>li->sResponse;
+			logar>>li->sTalkName;
+			logar>>li->tBeginTime;
+			logar>>li->tEndTime;
+			Log.AddTail(li);
+		}
+	}
+
+	return 0;
+}
+
+void CClientWnd::OnSize(UINT nType, int cx, int cy) 
+{
+	CWnd ::OnSize(nType, cx, cy);
+	
+	CRect r;
+	GetClientRect(&r);
+	int l=r.left+2;
+	int w=r.Width()-2;
+	int t=r.top+2;
+	int h=(r.Height()-2-2*14-20)/2;
+	HRemote.MoveWindow(l,t+1,w,14);
+	Remote.MoveWindow(l,t+=14,w,h);
+	HLocal.MoveWindow(l,t+=h,w,14);
+	Local.MoveWindow(l,t+=13,w,h);
+	Input.MoveWindow(l,t+=h,w,250);	
+}
+
+void CClientWnd::OnAccept()
+{
+	::EnterCriticalSection(&csAccept);
+	
+	if(m_bTalking||!m_bWantTalk){
+		CAsyncSocket socket;
+
+		if(!m_psockListen->Accept(socket))
+			return;
+
+		CLogItem * li= (CLogItem*) new CLogItem;
+		if(!li)
+			return;
+
+		li->bOut=false;
+		li->tBeginTime=CTime::GetCurrentTime();
+
+		CString ip;
+		UINT port;
+		socket.GetPeerName(ip,port);	
+		li->sIP=ip;
+
+		SendName(&socket);
+		SendString(&socket,"Sorry,I'm talking with another one,please call me later!\r\n",false);
+
+		li->tEndTime=CTime::GetCurrentTime();
+		li->sResponse="Call me later..";
+		Log.AddTail(li);        
+		return;
+	}
+	m_bTalking=true;
+
+	CLogItem * li= (CLogItem*) new CLogItem;
+	if(!li){
+		m_bTalking=false;
+		return;
+	}
+
+	CTalkSock * pSock = (CTalkSock*)new CTalkSock(this);
+	if(!pSock){
+		delete li;
+		delete pSock;
+		m_bTalking=false;
+		return;
+	}
+	if(!m_psockListen->Accept(*pSock)){
+		delete pSock;
+		delete li;
+		m_bTalking=false;
+		return;
+	}
+
+	li->bOut=false;
+	pSock->Type=m_bWantTalk?CTalkSock::TALKING:CTalkSock::DAEMON;
+	pSock->pLog=li;
+	Log.AddTail(li);
+	Connected(pSock);
+
+	::LeaveCriticalSection(&csAccept);
+}
+
+
+
+
+void CClientWnd::OnInput(CString &str)
+{
+	if(m_bTalking)
+		if(m_psockTalk)
+			SendString(m_psockTalk,str+"\r\n",true);
+}
+
+
+
+void CClientWnd::OnAddrbook() 
+{
+	CABDlg ab;
+	ab.AB=&AddrBook;
+	ab.DoModal();
+}
+
+
+
+void CClientWnd::PostNcDestroy() 
+{
+	if(m_bTalking){
+		if(m_psockTalk)
+			m_psockTalk->Close();
+	}
+	CFile abf;
+	if(abf.Open(ABFILE,CFile::modeCreate|CFile::modeReadWrite)){
+		CArchive abar(&abf,CArchive::store);
+		abar<<AddrBook.GetCount();
+		
+		POSITION pos=AddrBook.GetHeadPosition();
+		while(pos){
+			CABItem* pItem=(CABItem*)AddrBook.GetNext(pos);
+			abar<<pItem->Name;
+			abar<<pItem->IP;
+			abar<<pItem->WelMsg;
+			abar<<pItem->LvWord;
+			abar<<pItem->bWelMsg;
+			abar<<pItem->bLvWord;
+			delete pItem;
+		}
+	}
+	AddrBook.RemoveAll();
+
+	CFile logf;
+	if(logf.Open(LOGFILE,CFile::modeCreate|CFile::modeReadWrite)){
+		CArchive logar(&logf,CArchive::store);
+		logar<<Log.GetCount();
+		
+		POSITION pos=Log.GetHeadPosition();
+		while(pos){
+			CLogItem* li=(CLogItem*)Log.GetNext(pos);
+			logar<<li->bOut;
+			logar<<li->m_nLPos<<li->m_nRPos;
+			logar<<li->sIP;
+			logar<<li->sLocal<<li->sRemote;
+			logar<<li->sResponse;
+			logar<<li->sTalkName;
+			logar<<li->tBeginTime;
+			logar<<li->tEndTime;
+
+			delete li;
+		}
+	}
+	Log.RemoveAll();
+	CWnd::PostNcDestroy();
+}
+
+void CClientWnd::OnConnect() 
+{
+	CCDlg cd;
+	if(cd.DoModal()==IDOK)
+		Connect(cd.strIP);
+}
+
+void CClientWnd::Connect(CString &IP)
+{
+	if(m_bTalking){
+		if(AfxMessageBox("Do you want to close current connection?",MB_OKCANCEL)==IDCANCEL)
+			return;
+		if(m_psockTalk)
+			m_psockTalk->Close();
+		m_bTalking=false;
+	}
+
+	m_bTalking=true;
+
+	CTalkSock * pSock = (CTalkSock*)new CTalkSock(this);
+	if(!pSock){
+		m_bTalking=false;
+		return;
+	}
+	if(!pSock->Create()){
+		AfxMessageBox("Socket Failed!");
+		m_bTalking=false;
+		return;
+	}
+	
+	if(pSock->Connect(IP,813)){
+		AfxMessageBox(".......");
+		pSock->Close();
+		m_bTalking=false;
+		return;
+	}
+	if(pSock->GetLastError()!=WSAEWOULDBLOCK){
+		pSock->Close();
+		m_bTalking=false;
+		return;
+	}
+
+	CLogItem * li= (CLogItem*) new CLogItem;
+	if(!li){
+		pSock->Close();
+		m_bTalking=false;
+		return;
+	}
+	li->sIP=IP;
+	li->bOut=true;
+	pSock->pLog=li;
+	Log.AddTail(li);
+	pSock->Type=CTalkSock::TALKING;
+
+}
+
+void CClientWnd::SendName(CAsyncSocket *pSock)
+{
+	::EnterCriticalSection(&csSendName);	
+	int count=MyName.GetLength();
+	CString hdr('a',10);
+	hdr.SetAt(0,0);
+	hdr.SetAt(1,4);
+	hdr.SetAt(2,0);
+	hdr.SetAt(3,3);
+	hdr.SetAt(4,1);
+	hdr.SetAt(5,106);
+	hdr.SetAt(6,0);
+	hdr.SetAt(7,1);
+	hdr.SetAt(8,(char)count);
+	hdr.SetAt(9,0);
+	pSock->Send((const void *)(hdr+MyName),count+10);
+	::LeaveCriticalSection(&csSendName);
+}
+
+void CClientWnd::SendString(CAsyncSocket *pSock, CString str,BOOL bTalk)
+{
+	::EnterCriticalSection(&csSendString);
+
+	WORD pos=0;
+	BYTE buf[9];
+	int i,k,count,len;
+	BOOL wc=false;
+	BYTE fc;
+	CTalkSock * pTSock;
+
+	len=str.GetLength();
+	if(bTalk){
+		pTSock=(CTalkSock*)pSock;
+		pos=pTSock->pLog->m_nLPos;
+		pTSock->pLog->sLocal.Insert(pos,str);
+		if(pTSock->Type==CTalkSock::TALKING){
+			Local.SetSel(pos,pos);
+			Local.ReplaceSel(str);
+		}
+	}
+
+	str.Replace("\r\n","\r");
+	count=str.GetLength();
+	for(i=0;i<count;i++){
+		if(wc){
+			wc=false;
+			k=0;
+			buf[k++]=7;
+			buf[k++]=6;
+			buf[k++]=0;
+			buf[k++]=LOBYTE(pos);
+			buf[k++]=HIBYTE(pos);
+			buf[k++]=LOBYTE(pos);
+			buf[k++]=HIBYTE(pos);
+			buf[k++]=fc;
+			buf[k++]=str[i];
+			pSock->Send(buf,k);
+			pos+=2;
+		}else{
+			k=0;
+			buf[k++]=3;
+			buf[k++]=4;
+			buf[k++]=0;
+			buf[k++]=LOBYTE(pos);
+			buf[k++]=HIBYTE(pos);
+			buf[k++]=0;
+			buf[k++]=0;
+			pSock->Send(buf,k);
+			if(str[i]&0x80){
+				wc=true;
+				fc=str[i];
+				continue;
+			}			
+			k=0;
+			buf[k++]=4;
+			buf[k++]=5;
+			buf[k++]=0;
+			buf[k++]=LOBYTE(pos);
+			buf[k++]=HIBYTE(pos);
+			buf[k++]=LOBYTE(pos);
+			buf[k++]=HIBYTE(pos);
+			buf[k++]=str[i];
+			pSock->Send(buf,k);
+			pos++;
+			if(str[i]=='\r')
+				pos++;
+		}
+	}
+	if(bTalk){
+		pTSock=(CTalkSock*)pSock;
+		pTSock->pLog->m_nLPos+=len;
+	}
+	::LeaveCriticalSection(&csSendString);
+}
+
+void CClientWnd::OnSockClose(CTalkSock *pSock)
+{
+	m_psockTalk=NULL;
+	m_bTalking=false;
+}
+
+void CClientWnd::OnLog() 
+{
+	CLogDlg ld;
+	ld.Log=&Log;
+	switch(ld.DoModal()){
+	case ID_VIEW:
+		Local.SetWindowText(((CLogItem*)Log.GetAt(ld.pos))->sLocal);
+		Remote.SetWindowText(((CLogItem*)Log.GetAt(ld.pos))->sRemote);
+		break;
+	case ID_RECONN:
+		Connect(((CLogItem*)Log.GetAt(ld.pos))->sIP);
+		break;
+	case IDCANCEL:
+		break;
+	default:
+		break;
+	}
+}
+
+void CClientWnd::OnUpdateBeep(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(m_bTalking);	
+}
+
+void CClientWnd::OnBeep() 
+{
+	
+}
+
+void CClientWnd::OnDisc() 
+{
+	if(m_bTalking)
+		if(m_psockTalk)
+			m_psockTalk->Close();	
+}
+
+void CClientWnd::OnUpdateDisc(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(m_bTalking);
+}
+
+void CClientWnd::Connected(CTalkSock *pSock)
+{	
+	m_psockTalk=pSock;
+	
+	CString ip;
+	UINT port;
+	pSock->GetPeerName(ip,port);	
+	
+	pSock->pLog->tBeginTime=CTime::GetCurrentTime();
+	pSock->pLog->sIP=ip;
+
+
+	Local.SetWindowText(NULL);
+	Remote.SetWindowText(NULL);
+
+	SendName(pSock);
+
+	POSITION pos=AddrBook.GetHeadPosition();
+	while(pos){
+		CABItem* pItem=(CABItem*)AddrBook.GetNext(pos);
+		CString msg;
+		if(!pItem->IP.Compare(ip)){
+			if(pItem->bWelMsg)
+				SendString(pSock,pItem->WelMsg,true);
+			if(pItem->bLvWord)
+				if(pSock->Type==CTalkSock::DAEMON)
+					SendString(pSock,pItem->LvWord,true);
+			break;
+		}
+	}
+	
+}
+
+
+
+void CClientWnd::OnUpdateLog(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(!m_bTalking);	
+}
+
+void CClientWnd::OnClose() 
+{
+
+	CWnd::OnClose();
+}
+
+void CClientWnd::ConnectFail(CTalkSock * pSock,int nErrorCode)
+{
+	switch(nErrorCode){
+	case WSAETIMEDOUT:
+		AfxMessageBox("Time out.");
+		pSock->pLog->sResponse="Time Out.";
+		break;
+	default:
+		AfxMessageBox("Failed to connect to...");
+		pSock->pLog->sResponse="Failed.";
+		break;
+	}
+	pSock->Close();
+}
+
+void CClientWnd::OnUpdateCopy(CCmdUI* pCmdUI) 
+{
+	// TODO: Add your command update UI handler code here
+	
+}
+
+void CClientWnd::OnCopy() 
+{
+	// TODO: Add your command handler code here
+	
+}
+
+void CClientWnd::OnCut() 
+{
+	// TODO: Add your command handler code here
+	
+}
+
+void CClientWnd::OnUpdateCut(CCmdUI* pCmdUI) 
+{
+	// TODO: Add your command update UI handler code here
+	
+}
+
+void CClientWnd::OnPaste() 
+{
+}
+
+void CClientWnd::OnUpdatePaste(CCmdUI* pCmdUI) 
+{
+	if(!OpenClipboard()){
+		pCmdUI->Enable(false);
+		return;
+	}
+	pCmdUI->Enable((int)GetClipboardData(CF_TEXT));
+	CloseClipboard();
+}
