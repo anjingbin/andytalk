@@ -35,7 +35,6 @@
 #define IDI_OUT                         163
 #define IDI_IN                          164
 #define IDI_ICON5                       168
-#define IDR_LOGMENU                     174
 #define IDC_LIST                        1000
 #define IDC_IP                          1001
 #define IDC_NAME                        1002
@@ -109,21 +108,14 @@
 #define ID_SAVE                         32795
 #define ID_REC                          32796
 #define ID_TEST                         32797
-#define ID_LOG_ENCRYPT                  32799
-#define ID_LOG_MER                      32801
-#define ID_LOG_MER_ENC                  32802
-#define ID_LOG_ENC                      32803
-#define ID_LOG_EXP                      32804
-#define ID_LOG_MER2                     32805
-#define ID_LOG_DEC                      32806
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        175
-#define _APS_NEXT_COMMAND_VALUE         32807
+#define _APS_NEXT_RESOURCE_VALUE        174
+#define _APS_NEXT_COMMAND_VALUE         32798
 #define _APS_NEXT_CONTROL_VALUE         1051
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

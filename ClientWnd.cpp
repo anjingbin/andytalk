@@ -617,7 +617,7 @@ void CClientWnd::Connect(CString sHost,CString sName)
 		pSock->m_sIP=sHost;
 		pSock->m_sHostName.Empty();
 
-		if(!pSock->Connect(sHost,PORT))
+		if(!pSock->Connect(sHost,813))
 			if(pSock->GetLastError()!=WSAEWOULDBLOCK){
 				TSL.RemoveAt(pSock->m_MyPos);
 				delete pSock;
@@ -1321,7 +1321,9 @@ void CClientWnd::ProcessMessage(CTalkSock* pSock,MESSAGE msg)
 			wm+="\r\n";
 
 		wm.Replace("%name%",pSock->m_sNickName);
-		pSock->m_sLocal=wm+pSock->m_sLocal;
+
+		if( pSock->m_bCallIn )
+			pSock->m_sLocal=wm+pSock->m_sLocal;
 		
 		if(!m_bWantTalk){
 			am.Replace("%name%",pSock->m_sNickName);
@@ -1554,7 +1556,8 @@ void CClientWnd::ProcessOnConnect(CTalkSock* pSock,int nErrorCode)
 
 void CClientWnd::NotifySound(int nType)
 {
-	printf("\7\7\7\7");
+	// beep the speaker,by Andy,2002/11/15
+	//Beep(500,100);
 	if(nType==1)
 		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
 	if(nType==0)

@@ -60,7 +60,9 @@ BOOL CConfirm::OnInitDialog()
 	CString str;
 	str.Format("%d",m_nTimer);
 	GetDlgItem(IDC_TIME)->SetWindowText(str);	
-//	MessageBeep(-1);
+
+	//beep the speaker,by Andy,2002/11/15
+	//Beep(500,100);
 	::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
 
 	m_nTimer*=5;
@@ -79,9 +81,13 @@ void CConfirm::OnTimer(UINT nIDEvent)
 	CString str;
 	str.Format("%d",(--m_nTimer)/5);
 	GetDlgItem(IDC_TIME)->SetWindowText(str);
-//	MessageBeep(-1);
 	if(m_nTimer%8==0)
+	{
+		//beep the speaker,by Andy,2002/11/15
+		//Beep(500,100);
+
 		::PlaySound((const char *)IDR_NOTIFY,AfxGetInstanceHandle(),SND_RESOURCE|SND_ASYNC);	
+	}
 
 	if(m_nTimer<=0){
 		m_nReturn=2;

@@ -53,17 +53,9 @@ protected:
 	afx_msg void OnLogAdd();
 	afx_msg void OnDestroy();
 	afx_msg void OnDblclkLoglist(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnRclickLoglist(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnLogMerge();
-	afx_msg void OnLogEncrypt();
-	afx_msg void OnLogMerEnc();
-	afx_msg void OnLogExp();
-	afx_msg void OnLogMer2();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 private:
-	int MergeString2Log(CString,BOOL bremote,LOGITEM *li);
-	CString Log2MergeString(LOGITEM *,BOOL bremote);
 	CToolTipCtrl m_wndTip;
 };
 

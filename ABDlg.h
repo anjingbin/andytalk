@@ -34,8 +34,6 @@ public:
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CABDlg)
-	public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
@@ -55,8 +53,6 @@ protected:
 	afx_msg void OnDatetimechangeTime(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-private:
-	CToolTipCtrl m_wndTip;
 };
 
 //{{AFX_INSERT_LOCATION}}

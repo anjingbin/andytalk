@@ -138,18 +138,6 @@ BEGIN
     END
 END
 
-IDR_LOGMENU MENU DISCARDABLE 
-BEGIN
-    POPUP "logpopup"
-    BEGIN
-        MENUITEM "&Merge",                      ID_LOG_MER
-        MENUITEM "E&xpand",                     ID_LOG_EXP
-        MENUITEM "Make &Album",                 ID_LOG_MER2
-        MENUITEM "&Encrypt",                    ID_LOG_ENC
-        MENUITEM "M&erge && Encrypt",           ID_LOG_MER_ENC
-    END
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -170,7 +158,7 @@ END
 IDD_ADDRBOOK DIALOGEX 0, 0, 292, 141
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Address Book"
-FONT 9, "ËÎÌו", 0, 0, 0x1
+FONT 9, "ËÎÌו"
 BEGIN
     CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
@@ -210,8 +198,8 @@ CAPTION "Log"
 FONT 8, "Tahoma"
 BEGIN
     CONTROL         "List1",IDC_LOGLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,2,2,300,129,
-                    WS_EX_CLIENTEDGE
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | 
+                    WS_TABSTOP,2,2,300,129,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "&View",ID_VIEW,2,134,50,14
     PUSHBUTTON      "&Reconnect",ID_RECONN,56,134,50,14
     PUSHBUTTON      "&Delete",ID_LOG_DEL,110,134,50,14
@@ -538,15 +526,6 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     ID_REC                  "\nReconnect"
-    ID_LOG_ENCRYPT          "\nEncrypt selected msgs"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    ID_LOG_MER              "\nMerge selected msgs into one entry"
-    ID_LOG_MER_ENC          "\nMerge selected msgs into one, and then encrypt it"
-    ID_LOG_EXP              "\nExpand selected merged items"
-    ID_LOG_MER2             "\nMerge all items belonging to the user"
 END
 
 #endif    // Chinese (P.R.C.) resources

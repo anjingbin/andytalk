@@ -45,20 +45,6 @@ CMainFrame::~CMainFrame()
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	//create tray icon
-    m_NID.cbSize = sizeof(NOTIFYICONDATA);
-    m_NID.hWnd   = GetSafeHwnd();
-    m_NID.uID    = IDR_TRAYMENU;
-    m_NID.hIcon  = AfxGetApp()->LoadIcon(IDI_ICON4);
-    m_NID.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-    m_NID.uCallbackMessage =WM_ICON_NOTIFY;
-    strcpy(m_NID.szTip,"AndyTalk(CTRL+ALT+INS)");
-
-	if(!m_NID.hWnd)
-		return -1;
-
-	if(!Shell_NotifyIcon(NIM_ADD, &m_NID))
-		return -1;
 	//create mainframe and child windows
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
@@ -70,7 +56,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
 		|  CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC))
 		return -1;
-		
+
+	
 	// setup each toolbar button
 	CImageList img;
 	img.Create(IDB_TOOLBAR, 30, 0, RGB(191,191,191));
@@ -110,6 +97,23 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//set mainframe icon
 	SetIcon(AfxGetApp()->LoadIcon(IDI_ICON4),true);
 	SetIcon(AfxGetApp()->LoadIcon(IDI_ICON4),false);
+
+	// moved from the beginning of this function to here. by Andy.2002/11/15
+	//create tray icon
+    m_NID.cbSize = sizeof(NOTIFYICONDATA);
+    m_NID.hWnd   = GetSafeHwnd();
+    m_NID.uID    = IDR_TRAYMENU;
+    m_NID.hIcon  = AfxGetApp()->LoadIcon(IDI_ICON4);
+    m_NID.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+    m_NID.uCallbackMessage =WM_ICON_NOTIFY;
+    strcpy(m_NID.szTip,"AndyTalk(CTRL+ALT+INS)");
+
+	if(!m_NID.hWnd)
+		return -1;
+
+	if(!Shell_NotifyIcon(NIM_ADD, &m_NID))
+		return -1;
+
 
 	RegisterHotKey(GetSafeHwnd(),0,MOD_CONTROL|MOD_ALT,VK_INSERT);
 

@@ -26,11 +26,7 @@
 #define S_CLOSED		40		//socket closed,this means member m_hSocket=INVALID_SOCKET 
 
 //listen tcp port
-/* Changed by pubb, enclosure for debug */
-#ifndef	PORT
 #define PORT		813
-#endif
-/* end of change */
 
 //own-defined message
 #define WM_ICON_NOTIFY (WM_USER+11)		//tray icon notify

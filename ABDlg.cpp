@@ -84,49 +84,28 @@ void CABDlg::OnSave()
 	ABITEM *abi;
 
 	UpdateData();
-/* Changed by pubb, allowing to update an entry in Addressbook, and not allowing null input */
-	if(m_Name=="" || m_Host==""){
-		AfxMessageBox("Null input not allowed!");
+
+	POSITION pos=AB->GetHeadPosition();
+	while(pos){
+		abi=(ABITEM*)AB->GetNext(pos);
+		if(!abi->IP.Compare(m_Host) && !abi->Name.Compare(m_Name)){
+			AfxMessageBox("Same item exists!");
+			return;
+		}
+	}
+	
+	abi=(ABITEM*)new ABITEM;
+	if(!abi){
+		AfxMessageBox("Failed!");
 		return;
 	}
-	if(GetKeyState(VK_SHIFT)>=0 || m_List.GetSelectedCount()==0){	//insert save
-		POSITION pos=AB->GetHeadPosition();
-		while(pos){
-			abi=(ABITEM*)AB->GetNext(pos);
-			if(!abi->IP.Compare(m_Host) && !abi->Name.Compare(m_Name)){
-				AfxMessageBox("Same item exists!");
-				return;
-			}
-		}
-	
-		abi=(ABITEM*)new ABITEM;
-		if(!abi){
-			AfxMessageBox("Failed!");
-			return;
-		}
-	
-		abi->Name=m_Name;
-		abi->IP=m_Host;
-		pos=AB->AddTail(abi);
-	
-		int ret=m_List.InsertItem(LVIF_TEXT|LVIF_PARAM,m_List.GetItemCount(),m_Name,0,0,0,(LONG)pos);
-		m_List.SetItemText(ret,1,m_Host);
-	}else{	//shift-save, for update
-		POSITION pos=m_List.GetFirstSelectedItemPosition();
-		if(!pos)
-			return;
-		int i=m_List.GetNextSelectedItem(pos);
-		
-		m_List.SetItemText(i,0,m_Name);
-		m_List.SetItemText(i,1,m_Host);
 
-		abi=new ABITEM;
-		abi->Name=m_Name;
-		abi->IP=m_Host;
-		pos=AB->FindIndex(i);
-		AB->SetAt(pos,abi);
-	}
-/* end of change */
+	abi->Name=m_Name;
+	abi->IP=m_Host;
+	pos=AB->AddTail(abi);
+
+	int ret=m_List.InsertItem(LVIF_TEXT|LVIF_PARAM,m_List.GetItemCount(),m_Name,0,0,0,(LONG)pos);
+	m_List.SetItemText(ret,1,m_Host);
 }
 
 void CABDlg::OnConnect() 
@@ -165,11 +144,6 @@ BOOL CABDlg::OnInitDialog()
 
 	m_wndTime.SetFormat("' 'HH':'mm':'ss'    'yyy'-'MM'-'dd");
 	m_wndTime.SetTime(&CTime::GetCurrentTime());
-/* Added by pubb, for tips of update AB entry */
-	if(m_wndTip.Create(this)){
-		m_wndTip.AddTool(GetDlgItem(IDC_SAVE),"Shift: update entry");
-		m_wndTip.Activate(true);
-	}
 
 	m_wndTime.EnableWindow(false);
 	return TRUE;  
@@ -222,23 +196,4 @@ void CABDlg::OnDatetimechangeTime(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	m_wndTime.GetTime(m_tTime);	
 	*pResult = 0;
-}
-
-BOOL CABDlg::PreTranslateMessage(MSG* pMsg) 
-{
-	switch(pMsg->message){
-	case WM_LBUTTONDOWN:
-	case WM_MOUSEMOVE :
-	case WM_LBUTTONUP:
-	case WM_RBUTTONDOWN :
-	case WM_MBUTTONDOWN :
-	case WM_RBUTTONUP :
-	case WM_MBUTTONUP :
-		m_wndTip.RelayEvent(pMsg);
-		break;
-	default:
-		break;
-	}
-	
-	return CDialog::PreTranslateMessage(pMsg);
 }
