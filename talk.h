@@ -14,6 +14,8 @@
 
 #include "resource.h"       // main symbols
 #include "global.h"
+#include <Imm.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CTalkApp:
 // See talk.cpp for the implementation of this class

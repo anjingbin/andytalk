@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winmm.lib /nologo /subsystem:windows /machine:I386 /out:"Release/AndyTalkR.exe"
+# ADD LINK32 winmm.lib imm32.lib /nologo /subsystem:windows /machine:I386 /out:"Release/AndyTalkR.exe"
 
 !ELSEIF  "$(CFG)" == "talk - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winmm.lib /nologo /subsystem:windows /debug /machine:I386 /out:"Debug/AndyTalkD.exe" /pdbtype:sept
+# ADD LINK32 winmm.lib imm32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"Debug/AndyTalkD.exe" /pdbtype:sept
 
 !ENDIF 
 
@@ -338,6 +338,10 @@ SOURCE=.\res\wintalk.ico
 # End Group
 # Begin Source File
 
+SOURCE=.\ChangeLog.txt
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\Notify.wav
 # End Source File
 # Begin Source File
@@ -346,11 +350,7 @@ SOURCE=.\res\ohoh.wav
 # End Source File
 # Begin Source File
 
-SOURCE=.\protocal.htm
-# End Source File
-# Begin Source File
-
-SOURCE=.\protocal.txt
+SOURCE=.\protocol.txt
 # End Source File
 # Begin Source File
 
@@ -359,6 +359,10 @@ SOURCE=.\res\ringin.wav
 # Begin Source File
 
 SOURCE=.\res\ringout.wav
+# End Source File
+# Begin Source File
+
+SOURCE=.\ToDo.txt
 # End Source File
 # End Target
 # End Project

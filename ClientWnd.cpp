@@ -15,7 +15,6 @@
 #include "CfgPersonal.h"
 #include "mmsystem.h"
 
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -301,6 +300,7 @@ int CClientWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		SendMessage(WM_COMMAND,ID_LOG);
 	}
 */
+
 	return 0;
 }
 
@@ -631,7 +631,7 @@ void CClientWnd::Connect(CString sHost,CString sName)
 
 void CClientWnd::OnLog() 
 {
-	CLogDlg ld;
+	CLogDlg ld(this);
 	ld.AB=&m_ABList;
 	ld.m_sLogFile=m_sPath+LOGFILE;
 	if(ld.DoModal()==ID_RECONN){
@@ -1437,6 +1437,7 @@ void CClientWnd::ProcessMessage(CTalkSock* pSock,MESSAGE msg)
 		if(bInvisible && !pSock->m_bConfirming){
 			if(m_Config.bBeep){
 				NotifySound(-1);
+				pMain->FlashWindow(TRUE);
 			}else{ 
 				if(!pMain->IsWindowVisible()){
 					AfxGetMainWnd()->ShowWindow(SW_SHOW);
@@ -1941,3 +1942,5 @@ BOOL CClientWnd::getline(CString &str,FILE * fp)
 		str=buffer.Left(i);
 	return true;
 }
+
+

@@ -138,6 +138,18 @@ BEGIN
     END
 END
 
+IDR_LOGMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "logpopup"
+    BEGIN
+        MENUITEM "&Merge",                      ID_LOG_MER
+        MENUITEM "E&xpand",                     ID_LOG_EXP
+        MENUITEM "Make &Album",                 ID_LOG_MER2
+        MENUITEM "&Encrypt",                    ID_LOG_ENC
+        MENUITEM "M&erge && Encrypt",           ID_LOG_MER_ENC
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -147,11 +159,11 @@ END
 IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 209, 49
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About..."
-FONT 9, "宋体"
+FONT 8, "Tahoma"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,10,10,20,20
-    CTEXT           "AndyTalk v3.0",IDC_STATIC,42,13,100,8,SS_NOPREFIX
-    CTEXT           "2000.12.23",IDC_STATIC,32,25,123,8
+    CTEXT           "AndyTalk v3.01",IDC_STATIC,42,13,100,8,SS_NOPREFIX
+    CTEXT           "2001.5",IDC_STATIC,32,25,123,8
     DEFPUSHBUTTON   "确定",IDOK,152,7,50,14,WS_GROUP
 END
 
@@ -195,11 +207,11 @@ END
 IDD_LOG DIALOGEX 0, 0, 304, 151
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Log"
-FONT 9, "宋体", 0, 0, 0x1
+FONT 8, "Tahoma"
 BEGIN
     CONTROL         "List1",IDC_LOGLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | 
-                    WS_TABSTOP,2,2,300,129,WS_EX_CLIENTEDGE
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,2,2,300,129,
+                    WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "&View",ID_VIEW,2,134,50,14
     PUSHBUTTON      "&Reconnect",ID_RECONN,56,134,50,14
     PUSHBUTTON      "&Delete",ID_LOG_DEL,110,134,50,14
@@ -526,6 +538,15 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     ID_REC                  "\nReconnect"
+    ID_LOG_ENCRYPT          "\nEncrypt selected msgs"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_LOG_MER              "\nMerge selected msgs into one entry"
+    ID_LOG_MER_ENC          "\nMerge selected msgs into one, and then encrypt it"
+    ID_LOG_EXP              "\nExpand selected merged items"
+    ID_LOG_MER2             "\nMerge all items belonging to the user"
 END
 
 #endif    // Chinese (P.R.C.) resources

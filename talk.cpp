@@ -79,7 +79,6 @@ BOOL CTalkApp::InitInstance()
 	// The one and only window has been initialized, so show and update it.
 
 	
-
 	pFrame->MoveWindow(0,0,GetSystemMetrics(SM_CXSCREEN)*2/3,GetSystemMetrics(SM_CYSCREEN)*3/5);
 
 	pFrame->CenterWindow();

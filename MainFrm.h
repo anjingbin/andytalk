@@ -58,6 +58,7 @@ protected:
 	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	afx_msg void OnTrayNotify(WPARAM wParam,LPARAM lParam);
+	afx_msg	LRESULT	OnHotKey(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 private:

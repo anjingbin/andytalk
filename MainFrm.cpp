@@ -26,6 +26,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_ICON_NOTIFY,OnTrayNotify)      
+	ON_MESSAGE(WM_HOTKEY,OnHotKey)      
 END_MESSAGE_MAP()
 
 
@@ -51,7 +52,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_NID.hIcon  = AfxGetApp()->LoadIcon(IDI_ICON4);
     m_NID.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     m_NID.uCallbackMessage =WM_ICON_NOTIFY;
-    strcpy(m_NID.szTip,"AndyTalk");
+    strcpy(m_NID.szTip,"AndyTalk(CTRL+ALT+INS)");
 
 	if(!m_NID.hWnd)
 		return -1;
@@ -109,6 +110,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//set mainframe icon
 	SetIcon(AfxGetApp()->LoadIcon(IDI_ICON4),true);
 	SetIcon(AfxGetApp()->LoadIcon(IDI_ICON4),false);
+
+	RegisterHotKey(GetSafeHwnd(),0,MOD_CONTROL|MOD_ALT,VK_INSERT);
 
 	return 0;
 }
@@ -250,6 +253,8 @@ BOOL CMainFrame::DestroyWindow()
 	if(m_NID.hWnd)
 		Shell_NotifyIcon(NIM_DELETE, &m_NID);
 
+	UnregisterHotKey(GetSafeHwnd(),0);
+
 	m_wndClient.DestroyWindow();	
 	return CFrameWnd::DestroyWindow();
 }
@@ -291,4 +296,29 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	}
 
 	CFrameWnd::OnTimer(nIDEvent);
+}
+
+LRESULT	CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
+{
+	if(wParam != 0)
+		return true;
+
+	if(!IsWindowVisible()){
+		ShowWindow(SW_SHOW);
+		ShowWindow(SW_RESTORE);
+		SetForegroundWindow();
+	}else{
+		HWND wnd=::GetActiveWindow();
+		if(wnd !=GetSafeHwnd())
+		{
+			SetForegroundWindow();
+		}
+		else
+		{
+			SendMessage(WM_SYSCOMMAND,SC_CLOSE);
+		}
+
+	}
+	return true;
+
 }

@@ -33,6 +33,8 @@ public:
 	COutlookBar m_wndBar;
 	CLocalOut m_wndLocal;
 	CRemoteOut m_wndRemote;
+
+	HIMC m_hIMC;
 	CStatusBarCtrl m_wndStatus;
 
 	CListenSock* m_pListenSock;
