@@ -31,6 +31,8 @@ void CMsgPageW::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMsgPageW)
+	DDX_Control(pDX, IDC_LIST, m_wndList);
+	DDX_Control(pDX, IDC_EDIT, m_wndEdit);
 	DDX_Text(pDX, IDC_EDIT, m_msg);
 	//}}AFX_DATA_MAP
 }
@@ -38,6 +40,7 @@ void CMsgPageW::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMsgPageW, CPropertyPage)
 	//{{AFX_MSG_MAP(CMsgPageW)
+	ON_LBN_SELCHANGE(IDC_LIST, OnSelchangeList)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -45,3 +48,8 @@ END_MESSAGE_MAP()
 // CMsgPageW message handlers
 
 
+
+void CMsgPageW::OnSelchangeList() 
+{
+	m_wndEdit.GetWindowText	
+}

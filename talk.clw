@@ -2,7 +2,7 @@
 
 [General Info]
 Version=1
-LastClass=CCfgGen
+LastClass=CMsgPageW
 LastTemplate=CDialog
 NewFileInclude1=#include "stdafx.h"
 NewFileInclude2=#include "talk.h"
@@ -34,17 +34,17 @@ Class22=CTalkSock
 
 ResourceCount=12
 Resource1=IDD_CONFIRM
-Resource2=IDD_PERSONAL
-Resource3=IDR_MAINFRAME
-Resource4=IDR_TRAYMENU
-Resource5=IDD_CFG_MSG_3
-Resource6=IDD_CONNECT
-Resource7=IDD_CFG_MSG_1
-Resource8=IDD_CFG_GENERAL
-Resource9=IDD_ADDRBOOK
-Resource10=IDD_LOG
-Resource11=IDD_VIEW
-Resource12=IDD_ABOUTBOX
+Resource2=IDD_CFG_GENERAL
+Resource3=IDD_CONNECT
+Resource4=IDD_CFG_MSG_3
+Resource5=IDD_PERSONAL
+Resource6=IDD_ABOUTBOX
+Resource7=IDD_ADDRBOOK
+Resource8=IDD_VIEW
+Resource9=IDR_TRAYMENU
+Resource10=IDD_CFG_MSG_1
+Resource11=IDD_LOG
+Resource12=IDR_MAINFRAME
 
 [CLS:CABDlg]
 Type=0
@@ -262,13 +262,13 @@ Control24=IDC_BEEP,button,1342242819
 Control25=IDC_STARTUP,button,1342242819
 Control26=IDC_STATIC,button,1342177287
 Control27=IDC_STATIC,static,1342308864
-Control28=IDC_EMOTE1,edit,1350631425
-Control29=IDC_STATIC,static,1342308864
-Control30=IDC_EMOTE2,edit,1350631425
-Control31=IDC_STATIC,static,1342308864
-Control32=IDC_EMOTE3,edit,1350631425
-Control33=IDC_STATIC,static,1342308864
-Control34=IDC_EMOTEESC,edit,1350631425
+Control28=IDC_STATIC,static,1342308864
+Control29=IDC_HOTKEY1,msctls_hotkey32,1350631424
+Control30=IDC_STATIC,static,1342308864
+Control31=IDC_HOTKEY2,msctls_hotkey32,1350631424
+Control32=IDC_STATIC,static,1342308864
+Control33=IDC_HOTKEY3,msctls_hotkey32,1350631424
+Control34=IDC_HOTKEY4,msctls_hotkey32,1350631424
 
 [DLG:IDD_PERSONAL]
 Type=1
@@ -314,14 +314,20 @@ Control3=IDC_LOCAL,edit,1353783492
 [DLG:IDD_CFG_MSG_3]
 Type=1
 Class=CMsgPageB
-ControlCount=1
+ControlCount=4
 Control1=IDC_EDIT,edit,1353781444
+Control2=IDC_NEW,button,1342242816
+Control3=IDC_DELETE,button,1342242816
+Control4=IDC_LIST,listbox,1352728835
 
 [DLG:IDD_CFG_MSG_1]
 Type=1
 Class=CMsgPageW
-ControlCount=1
+ControlCount=4
 Control1=IDC_EDIT,edit,1353781444
+Control2=IDC_LIST,listbox,1352728835
+Control3=IDC_NEW,button,1342242816
+Control4=IDC_DELETE,button,1342242816
 
 [DLG:IDD_ABOUTBOX]
 Type=1

@@ -22,6 +22,8 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CMsgPageW)
 	enum { IDD = IDD_CFG_MSG_1 };
+	CListBox	m_wndList;
+	CEdit	m_wndEdit;
 	CString	m_msg;
 	//}}AFX_DATA
 
@@ -37,6 +39,7 @@ public:
 protected:
 	// Generated message map functions
 	//{{AFX_MSG(CMsgPageW)
+	afx_msg void OnSelchangeList();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
