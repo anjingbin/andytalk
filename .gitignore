@@ -1,0 +1,28 @@
+# Build / IDE
+Debug/
+Release/
+.vs/
+CVS/
+*.ncb
+*.opt
+*.plg
+*.aps
+*.suo
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.lib
+*.dat
+# Source Insight
+*.IAB
+*.IAD
+*.IMB
+*.IMD
+*.PFI
+*.PO
+*.PR
+*.PRI
+*.PS
+*.WK3
