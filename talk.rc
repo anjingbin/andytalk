@@ -1,0 +1,578 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\talk.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\talk.ico"
+IDI_ICON1               ICON    DISCARDABLE     "res\\wintalk.ico"
+IDI_ICON2               ICON    DISCARDABLE     "res\\129.ico"
+IDI_ICON3               ICON    DISCARDABLE     "res\\131.ico"
+IDI_ICON4               ICON    DISCARDABLE     "res\\130.ico"
+IDI_DEAD                ICON    DISCARDABLE     "res\\active.ico"
+IDI_ACTIVE              ICON    DISCARDABLE     "res\\icon6.ico"
+IDI_TRY                 ICON    DISCARDABLE     "res\\try.ico"
+IDI_NEW                 ICON    DISCARDABLE     "res\\W95mbx04.ico"
+IDI_OUT                 ICON    DISCARDABLE     "res\\Arw06rt.ico"
+IDI_IN                  ICON    DISCARDABLE     "res\\Arw06lt.ico"
+IDI_ICON5               ICON    DISCARDABLE     "res\\conn.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Connect...\tF1",             ID_CONNECT
+        MENUITEM "&Reconnect\tF2",              ID_REC, INACTIVE
+        MENUITEM "&Disconnect\tF3",             ID_DISC, GRAYED
+        MENUITEM "&Beep\tF4",                   ID_BEEP, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM SEPARATOR
+        POPUP "&Scrollbar"
+        BEGIN
+            MENUITEM "&Horizontal",                 ID_HSCROLL, CHECKED
+            MENUITEM "&Vertical",                   ID_VSCROLL, CHECKED
+        END
+    END
+    POPUP "&Option"
+    BEGIN
+        MENUITEM "&Want to talk\tCtrl+W",       ID_WANTTALK
+        MENUITEM SEPARATOR
+        MENUITEM "&Setting...\t",               ID_SETTING
+        MENUITEM "&Font...",                    ID_FONT
+        MENUITEM "&Background...",              ID_BACKCOLOR
+        MENUITEM SEPARATOR
+        MENUITEM "&Address Book..\tF5",         ID_ADDRBOOK
+        MENUITEM "&Log list..\tF6",             ID_LOG
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About...",                   ID_APP_ABOUT
+    END
+END
+
+IDR_TRAYMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "popup"
+    BEGIN
+        MENUITEM "&Want to talk",               ID_WANTTALK
+        MENUITEM "&Setting...",                 ID_SETTING
+        MENUITEM "&Log...",                     ID_LOG
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+        MENUITEM SEPARATOR
+        MENUITEM "&About",                      ID_APP_ABOUT
+    END
+END
+
+IDR_LOGMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "logpopup"
+    BEGIN
+        MENUITEM "&Merge",                      ID_LOG_MER
+        MENUITEM "E&xpand",                     ID_LOG_EXP
+        MENUITEM "Make &Album",                 ID_LOG_MER2
+        MENUITEM "&Encrypt",                    ID_LOG_ENC
+        MENUITEM "M&erge && Encrypt",           ID_LOG_MER_ENC
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 209, 49
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About..."
+FONT 8, "Tahoma"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,10,10,20,20
+    CTEXT           "AndyTalk v3.01",IDC_STATIC,42,13,100,8,SS_NOPREFIX
+    CTEXT           "2001.5",IDC_STATIC,32,25,123,8
+    DEFPUSHBUTTON   "确定",IDOK,152,7,50,14,WS_GROUP
+END
+
+IDD_ADDRBOOK DIALOGEX 0, 0, 292, 141
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Address Book"
+FONT 9, "宋体", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,2,3,136,135,
+                    WS_EX_CLIENTEDGE
+    GROUPBOX        "User Info",IDC_STATIC,140,3,150,84
+    LTEXT           "&Name:",IDC_STATIC,150,19,21,8
+    EDITTEXT        IDC_NAME,182,17,99,12,ES_AUTOHSCROLL
+    LTEXT           "&Host:",IDC_STATIC,149,38,27,8
+    EDITTEXT        IDC_HOST,181,35,100,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "&C&lear",IDC_CLEAR,148,68,44,14
+    PUSHBUTTON      "&Delete",IDC_DELETE,194,68,44,14
+    PUSHBUTTON      "&Save",IDC_SAVE,240,68,44,14
+    CONTROL         "S&cheduled to connect at:",IDC_SCHEDULE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,140,93,150,9
+    CONTROL         "DateTimePicker1",IDC_TIME,"SysDateTimePick32",
+                    DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,181,104,
+                    109,13
+    DEFPUSHBUTTON   "&Connect",IDC_CONNECT,160,124,64,14
+    PUSHBUTTON      "Cl&ose",IDOK,226,124,64,14
+END
+
+IDD_CONNECT DIALOG DISCARDABLE  0, 0, 177, 39
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Connect to..."
+FONT 9, "宋体"
+BEGIN
+    LTEXT           "Hostname:",IDC_STATIC,5,5,58,9
+    EDITTEXT        IDC_HOST,4,15,114,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,125,3,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,125,19,50,14
+END
+
+IDD_LOG DIALOGEX 0, 0, 304, 151
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Log"
+FONT 8, "Tahoma"
+BEGIN
+    CONTROL         "List1",IDC_LOGLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,2,2,300,129,
+                    WS_EX_CLIENTEDGE
+    DEFPUSHBUTTON   "&View",ID_VIEW,2,134,50,14
+    PUSHBUTTON      "&Reconnect",ID_RECONN,56,134,50,14
+    PUSHBUTTON      "&Delete",ID_LOG_DEL,110,134,50,14
+    PUSHBUTTON      "&Add to AddressBook",ID_LOG_ADD,164,134,84,14
+    PUSHBUTTON      "&Close",IDCANCEL,252,134,50,14
+END
+
+IDD_VIEW DIALOG DISCARDABLE  0, 0, 304, 231
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Log view"
+FONT 9, "宋体"
+BEGIN
+    PUSHBUTTON      "&Close",IDOK,108,216,86,14
+    EDITTEXT        IDC_REMOTE,2,2,300,112,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN | 
+                    WS_VSCROLL | WS_HSCROLL
+    EDITTEXT        IDC_LOCAL,2,116,300,98,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN | 
+                    WS_VSCROLL | WS_HSCROLL
+END
+
+IDD_CFG_MSG_1 DIALOG DISCARDABLE  0, 0, 300, 181
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Welcome Message"
+FONT 9, "宋体"
+BEGIN
+    EDITTEXT        IDC_EDIT,2,2,296,176,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL | 
+                    NOT WS_TABSTOP
+END
+
+IDD_CFG_MSG_3 DIALOG DISCARDABLE  0, 0, 300, 181
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Absent Message"
+FONT 9, "宋体"
+BEGIN
+    EDITTEXT        IDC_EDIT,2,2,296,176,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL | 
+                    NOT WS_TABSTOP
+END
+
+IDD_CFG_GENERAL DIALOG DISCARDABLE  0, 0, 300, 181
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "General"
+FONT 9, "宋体"
+BEGIN
+    GROUPBOX        "My &name:",IDC_STATIC,4,6,82,34,WS_TABSTOP
+    EDITTEXT        IDC_MYNAME,10,20,70,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    GROUPBOX        "&Connect",IDC_STATIC,91,6,206,47
+    LTEXT           "&Retry after",IDC_STATIC,97,20,49,9
+    EDITTEXT        IDC_RETRYINTERVAL,149,18,28,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "Spin5",IDC_SPIN6,"msctls_updown32",UDS_WRAP | 
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_HOTTRACK,212,19,11,10
+    LTEXT           "minutes",IDC_STATIC,180,20,38,9
+    LTEXT           "Re&try",IDC_STATIC,97,36,23,11
+    EDITTEXT        IDC_RETRY,122,34,28,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin5",IDC_SPIN5,"msctls_updown32",UDS_WRAP | 
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_HOTTRACK,195,35,11,10
+    LTEXT           "times",IDC_STATIC,153,36,34,11
+    GROUPBOX        "Miscellaneous:",IDC_STATIC,2,52,297,94
+    CONTROL         "&Max connections allowed",IDC_STATIC,"Static",
+                    SS_LEFTNOWORDWRAP | SS_CENTERIMAGE | WS_GROUP,6,70,99,12
+    EDITTEXT        IDC_MAXCONN,110,70,35,12,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_GROUP
+    CONTROL         "Spin1",IDC_SPIN1,"msctls_updown32",UDS_WRAP | 
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,130,70,11,
+                    12
+    LTEXT           "&Disconnect when idle for ",IDC_STATIC,6,86,101,10,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_TIME1,110,84,35,12,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_GROUP
+    CONTROL         "Spin1",IDC_SPIN2,"msctls_updown32",UDS_WRAP | 
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_HOTTRACK,130,84,11,12
+    LTEXT           "seconds",IDC_STATIC,147,84,40,12,SS_CENTERIMAGE
+    LTEXT           "&Confirm failed after",IDC_STATIC,6,100,100,10,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_TIME2,110,98,35,12,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_GROUP
+    CONTROL         "Spin1",IDC_SPIN3,"msctls_updown32",UDS_WRAP | 
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,130,98,11,
+                    12
+    LTEXT           "seconds",IDC_STATIC,147,98,40,12,SS_CENTERIMAGE
+    CONTROL         "&Beep when new message received",IDC_BEEP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,8,116,194,12
+    CONTROL         "&Auto load at Windows startup",IDC_STARTUP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,8,130,210,12
+    GROUPBOX        "Emote keys:",IDC_STATIC,2,151,297,30
+    LTEXT           "1:",IDC_STATIC,7,164,13,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTE1,21,164,16,13,ES_CENTER
+    LTEXT           "2:",IDC_STATIC,47,164,11,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTE2,59,164,16,13,ES_CENTER
+    LTEXT           "3:",IDC_STATIC,85,164,14,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTE3,100,164,16,13,ES_CENTER
+    LTEXT           "Escape key:",IDC_STATIC,126,164,52,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EMOTEESC,177,164,16,13,ES_CENTER
+END
+
+IDD_PERSONAL DIALOG DISCARDABLE  0, 0, 300, 181
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Personal message"
+FONT 9, "宋体"
+BEGIN
+    LTEXT           "&Name:",IDC_STATIC,6,3,44,10,SS_CENTERIMAGE
+    LISTBOX         IDC_NAMELIST,1,14,77,165,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Welcome message:",IDC_BWELMSG,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,83,2,94,12
+    EDITTEXT        IDC_WELMSG,82,14,216,76,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    CONTROL         "&Absent message:",IDC_BABSMSG,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,82,93,94,11
+    EDITTEXT        IDC_ABSMSG,81,105,216,74,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+END
+
+IDD_CONFIRM DIALOG DISCARDABLE  0, 0, 187, 49
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Talk?"
+FONT 9, "宋体"
+BEGIN
+    DEFPUSHBUTTON   "&Yes",IDOK,80,34,50,14
+    PUSHBUTTON      "&No",IDCANCEL,134,34,50,14
+    LTEXT           "",IDC_TEXT,25,11,158,17
+    CONTROL         "fdsare",IDC_TIME,"Static",SS_LEFTNOWORDWRAP | 
+                    SS_CENTERIMAGE | WS_GROUP,48,34,30,12
+    CONTROL         "Talk?",IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | 
+                    SS_CENTERIMAGE | WS_GROUP,23,33,20,14
+    ICON            IDI_ICON3,IDC_STATIC,2,6,20,20
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 3,0,5,8
+ PRODUCTVERSION 3,0,5,8
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 202
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 42
+    END
+
+    IDD_ADDRBOOK, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 290
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 138
+    END
+
+    IDD_CONNECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 175
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 36
+    END
+
+    IDD_LOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 303
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 149
+    END
+
+    IDD_VIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 297
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 224
+    END
+
+    IDD_CFG_MSG_1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 174
+    END
+
+    IDD_CFG_MSG_3, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 174
+    END
+
+    IDD_PERSONAL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+    END
+
+    IDD_CONFIRM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 42
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TOOLBAR             BITMAP  DISCARDABLE     "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// WAVE
+//
+
+IDR_LOGOUT              WAVE    DISCARDABLE     "res\\ohoh.wav"
+IDR_NOTIFY              WAVE    DISCARDABLE     "res\\ringout.wav"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS DISCARDABLE 
+BEGIN
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_F1,          ID_CONNECT,             VIRTKEY, NOINVERT
+    VK_F2,          ID_REC,                 VIRTKEY, NOINVERT
+    VK_F3,          ID_DISC,                VIRTKEY, NOINVERT
+    VK_F4,          ID_BEEP,                VIRTKEY, NOINVERT
+    VK_F5,          ID_ADDRBOOK,            VIRTKEY, NOINVERT
+    VK_F6,          ID_LOG,                 VIRTKEY, NOINVERT
+    "W",            ID_WANTTALK,            VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDP_SOCKETS_INIT_FAILED "Windows 通信端口初始化失败。"
+END
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    IDR_MAINFRAME           "AndyTalk"
+END
+
+STRINGTABLE PRELOAD DISCARDABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "AndyTalk"
+    AFX_IDS_IDLEMESSAGE     "就绪"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_INDICATOR_CAPS       "CAP"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_CONNECT              "\nConnect"
+    ID_SETTING              "\nSetting"
+    ID_ADDRBOOK             "\nAddress Book"
+    ID_DISC                 "\nDisconnect"
+    ID_BEEP                 "\nBeep"
+    ID_LOG                  "\nLog"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_CLEAR           "\nClear"
+    ID_EDIT_COPY            "\nCopy"
+    ID_EDIT_CUT             "\nCut"
+    ID_EDIT_PASTE           "\nPaste"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_REC                  "\nReconnect"
+    ID_LOG_ENCRYPT          "\nEncrypt selected msgs"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_LOG_MER              "\nMerge selected msgs into one entry"
+    ID_LOG_MER_ENC          "\nMerge selected msgs into one, and then encrypt it"
+    ID_LOG_EXP              "\nExpand selected merged items"
+    ID_LOG_MER2             "\nMerge all items belonging to the user"
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE 4, 2
+#pragma code_page(936)
+#endif //_WIN32
+#include "res\talk.rc2"  // non-Microsoft Visual C++ edited resources
+#include "l.chs\afxres.rc"          // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

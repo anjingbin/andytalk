@@ -1,0 +1,100 @@
+TCP port:813
+
+	i.	When connected,all data exchanged between caller and callee
+are trasfered message by message.
+	ii. All messages need not any acknowledgement,and all types of message 
+can be sent from caller to callee and vice versa.
+	iii.A message consists of a Header and Data.
+	Header:
+			struct {
+				BYTE command;	
+				WORD length;
+			}
+	* command is a byte of command id;
+	* length is a word,implicits the length in bytes of data followed;
+	
+
+	iv.	All available command and length combinations are listed in following table:
+
+	--------------------------------------------------------------------------------------
+	command	|	length	| fuction
+	--------------------------------------------------------------------------------------
+	0		|	4		| version info,must be send as soon as connected
+	--------------------------------------------------------------------------------------
+	1		|	0-n		| name
+	--------------------------------------------------------------------------------------
+	2		|	0-n		| replace all remote text with text in data followed
+	--------------------------------------------------------------------------------------
+	3		|	4		| set the current pos of remote editbox
+	--------------------------------------------------------------------------------------
+	4		|	5		| replace text section with a ascii character
+	--------------------------------------------------------------------------------------
+	5		|	8,9		| delete text	
+	--------------------------------------------------------------------------------------
+	6		|	4		| delete text
+	--------------------------------------------------------------------------------------
+	7		|	6		| replace text section with a two-byte (e.g. chinese) character
+	--------------------------------------------------------------------------------------
+	8		|	2		| beep once
+	--------------------------------------------------------------------------------------
+
+	v.	All command data structs:
+	Command 0:						  //version
+		struct _cmd0{
+			BYTE main_version;        //windtalk main version,now is 3
+			BYTE minor_version;       //windtalk minor version,now is 1
+			WORD build;               //windtalk build number,now is 106
+		}
+	Command 1:						  //name	
+		struct _cmd1{
+			char name[len];			  //name string without zero at the end,"len" 
+									  // means the length parameter specified in header
+		}	
+	Command 2:						  //replace all text with "newtext"	
+		struct _cmd2{
+			char newtext[len];		  //new text without zero at the end,on this message,we should replace 
+									  // all text received before with the newtext
+		}
+	Command 3:						  //set caret to "newpos"	
+		struct _cmd3{				  	
+			WORD newpos;			  //the new caret position	
+			WORD zero;				  //always zero	
+		}
+	Command 4:						  //replace text from "begin" to "end" with the char "newchar"
+		struct _cmd4{				  
+			WORD begin;				  //begin position 		
+			WORD end;				  //end position
+			char newchar;			  //character	
+		}
+	Command 5:						  //delete text
+		len=8:						  //we should delete text from wa and wb and from wa to wc
+		struct _cmd5_8{
+			WORD wa;
+			WORD wb;
+			WORD wc;
+			WORD wd;	
+		}
+		len=9:						  //delete text from wa to wb	
+		struct _cmd5_9{
+			WORD wa;				  
+			WORD wb;
+			BYTE _2e;				  //always 0x2e
+			WORD wc;				  //not used	
+			WORD wd;				  //not used	
+		}
+	Command 6:						  //delete "length" characters from "begin"
+		struct _cmd6{
+			WORD begin;
+			WORD length;
+		}
+	Command 7:						  //replace text from "begin" to "end" with wide character "wnewchar"
+		struct _cmd7{
+			WORD begin;
+			WORD end;
+			WORD wnewchar;			  //two-byte character	
+		}
+	Command 8:						  //beep once
+		struct _cmd8{	
+			WORD zero;				  //always zero
+		}
+

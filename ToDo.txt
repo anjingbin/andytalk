@@ -1,0 +1,12 @@
+#ToDo by pubb since 2002.03.04
+#1.multi-selection in Logs, and then multi-delete and multi-addtoaddressbook
+#2.multi-selection in AddressBook, and then multi-delete
+#3.'shift-save' in AddressBook to do 'Change' instead of normal 'add'
+4.Contextmenu in Logs, including 'Merge' and 'Encrypt'
+	can't do linefeed and carriagereturn correctly when view
+#5.Overwrite option when 'Add to Addressbook' in Logs, with the same name but
+  the newer ip
+6.Make .wavs configurable from on-disk files
+7.Multicast to a group in Message form
+8.Secure talks with Ipsec
+9.Rearrange Strings to Strings Table for multi-language preparation

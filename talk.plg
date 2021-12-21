@@ -1,0 +1,57 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: talk - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Release/talk.res" /d "NDEBUG" /d "_AFXDLL" "E:\others\AndyTalk\talk.rc"" 
+Creating temporary file "C:\Temp\RSP150.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /FR"Release/" /Fp"Release/talk.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\others\AndyTalk\ClientWnd.cpp"
+"E:\others\AndyTalk\LogDlg.cpp"
+]
+Creating command line "cl.exe @C:\Temp\RSP150.tmp" 
+Creating temporary file "C:\Temp\RSP151.tmp" with contents
+[
+winmm.lib imm32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/AndyTalkR.pdb" /machine:I386 /out:"Release/AndyTalkR.exe" 
+.\Release\ABDlg.obj
+.\Release\CDlg.obj
+.\Release\CfgGen.obj
+.\Release\CfgPersonal.obj
+.\Release\ClientWnd.obj
+.\Release\Config.obj
+.\Release\Confirm.obj
+.\Release\InplaceEdit.obj
+.\Release\ListenSock.obj
+.\Release\LocalOut.obj
+.\Release\LogDlg.obj
+.\Release\LogView.obj
+.\Release\MainFrm.obj
+.\Release\MsgPageA.obj
+.\Release\MsgPageW.obj
+.\Release\OutlookBar.obj
+.\Release\RemoteOut.obj
+.\Release\StdAfx.obj
+.\Release\talk.obj
+.\Release\TalkSock.obj
+.\Release\talk.res
+]
+Creating command line "link.exe @C:\Temp\RSP151.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+ClientWnd.cpp
+LogDlg.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+AndyTalkR.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
